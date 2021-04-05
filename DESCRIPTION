@@ -1,0 +1,23 @@
+Package: mdl
+Title: R package for working with UNHCR Microdata Library APIs
+Version: 1.0
+Authors@R: 
+    person(given = "Federico",
+           family = "Sanson",
+           role = c("aut", "cre"),
+           email = "sanson@unhcr.com"
+		   )
+Description: This package provides functions to easily use the UNHCR Microdata Library, to create datasets, upload files and generate metadata.
+License: `use_gpl3_license()`
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Imports: 
+    httr,
+    jsonlite,
+    labelled,
+    haven,
+    nadar
+Remotes: 
+    mah0001/nadar

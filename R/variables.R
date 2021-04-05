@@ -1,0 +1,414 @@
+# Create a data file metadata in a survey. Once a file is create, you add variables metadata to it.
+survey_create_data_file <- function(
+    survey_idno,
+    file_id,
+    file_name,
+    description,
+    case_count,
+    var_count,
+    producer = NULL,
+    data_checks = NULL,
+    missing_data = NULL,
+    version = NULL,
+    notes = NULL,
+    api_key = NULL,
+    api_base_url = NULL
+){
+
+    # get api key and url if not specified
+    if(is.null(api_key)){
+        api_key=nadar::get_api_key();
+    }
+    if(is.null(api_base_url)){
+        api_base_url=nadar::get_api_url();
+    }
+
+    # specify call options
+    options = list(
+        file_id = file_id,
+        file_name = file_name,
+        description = description,
+        case_count = case_count,
+        var_count = var_count,
+        producer = producer,
+        data_checks = data_checks,
+        missing_data = missing_data,
+        version = version,
+        notes = notes
+    )
+
+    # specify url
+    url <-  paste(api_base_url, "datasets", "datafiles", survey_idno, sep = "/")
+
+    # call API
+    httpResponse <- httr::POST(url,
+                               httr::add_headers("X-API-KEY" = api_key),
+                               body = options,
+                               encode = "json"
+    )
+
+    # print error if any
+    if(httpResponse$status_code!=200){
+        warning(httr::content(httpResponse, "text"))
+    }
+
+
+    # return output
+    output <- list(
+        status_code = httpResponse$status_code,
+        response = jsonlite::fromJSON(httr::content(httpResponse,"text"))
+    )
+
+    return(output)
+}
+
+### test
+# survey_create_data_file_response <- survey_create_data_file(survey_idno = test_survey_idno,
+#                                                             file_id = "file_test_3",
+#                                                             file_name = "file name 3",
+#                                                             description = "file descr",
+#                                                             case_count = 100,
+#                                                             var_count = 300)
+
+
+###############
+
+# Create a variable from a list of metadata. Can create more than one variable at once passing a list of metadata
+survey_create_variable <- function(
+    survey_idno,
+    file_id,
+    var_metadata,
+    api_key = NULL,
+    api_base_url = NULL
+){
+
+    # get api key and url if not specified
+    if(is.null(api_key)){
+        api_key=nadar::get_api_key();
+    }
+    if(is.null(api_base_url)){
+        api_base_url=nadar::get_api_url();
+    }
+
+    # specify call options
+    options <- var_metadata
+
+    # specify url
+    url <-  paste(api_base_url, "datasets", "variables", survey_idno, file_id, sep = "/")
+
+    # call API
+    httpResponse <- httr::POST(url,
+                               httr::add_headers("X-API-KEY" = api_key),
+                               body = options,
+                               encode = "json"
+    )
+
+    # print error if any
+    if(httpResponse$status_code!=200){
+        warning(httr::content(httpResponse, "text"))
+    }
+
+
+    # return output
+    output <- list(
+        status_code = httpResponse$status_code,
+        response = jsonlite::fromJSON(httr::content(httpResponse,"text"))
+    )
+
+    return(output)
+}
+
+###TEST
+# variable_create_options1 <- list(
+#     vid = "V1",
+#     name = "var_name1",
+#     labl = "var label1"
+# )
+#
+# variable_create_options2 <- list(
+#     vid = "asdasd_dsadas",
+#     name = "var_name 5",
+#     labl = NULL #"var label 2"
+# )
+# variable_create_options_list <- list(variable_create_options1, variable_create_options2 )
+#
+# survey_create_variable_response <- survey_create_variable(    survey_idno = test_survey_idno,
+#                                                               file_id = "file_test_1",
+#                                                               var_metadata = variable_create_options2)
+
+
+#########
+
+# Create a file with all variables metadata starting from a stata .dta file
+#' @export
+mdl_create_vars_from_dta <- function(survey_idno, file_path, file_id = NA, file_name, file_description){
+
+    # if file id not provided, uses the name of the file
+    if(is.na(file_id)){
+        file_id <- basename(file_path) # get only file name
+        file_id <- gsub(pattern = "\\.dta$", "", file_id) # remove extension
+        file_id <- gsub("[^A-Za-z0-9]", "_", file_id) # replace special chars with underscore
+    }
+
+    data_frame <- haven::read_dta(file_path)
+    mdl_create_vars_from_dataframe(survey_idno = survey_idno, data_frame = data_frame, file_id = file_id, file_name = file_name, file_description = file_description)
+}
+
+# Create a file with all variables metadata starting from a data frame
+# Labels must be set with labelled::var_label or the data frame must be imported from a Stata file using haven::read_dta
+#' @export
+mdl_create_vars_from_dataframe <- function(survey_idno, data_frame, file_id, file_name, file_description){
+
+    #create data file that will contain the variables
+    survey_create_data_file(
+        survey_idno = survey_idno,
+        file_id = file_id,
+        file_name = file_name,
+        description = file_description,
+        case_count = nrow(data_frame),
+        var_count = ncol(data_frame)
+    )
+
+    # iterate over variables
+    var_options_list <- list()
+    for(i in 1:ncol(data_frame)){
+        print(i)
+
+        # get basic info
+        a_var <- data_frame[[i]]
+        a_var_class <- class(a_var)[1]
+        a_var_id <- paste0(file_id, "_V", i)
+        a_var_name <- names(data_frame)[i]
+        a_var_label <- labelled::var_label(a_var, unlist = TRUE)
+        a_var_label <- ifelse(is.null(a_var_label), "", a_var_label)
+
+        # set basic options
+        a_var_options <- list(
+            vid = a_var_id,
+            name = a_var_name,
+            labl = a_var_label
+        )
+
+        ##### CHARACTER
+        if(a_var_class == "character"){
+
+            a_var_options$var_intrvl = "discrete"
+            a_var_options$var_format = list(type = "Character")
+            a_var_options$var_sumstat = data.frame(value  = c(sum(!is.na(a_var)), sum(is.na(a_var))), type = c("vald", "invd"))
+        }
+
+        ##### FACTOR
+        if(a_var_class %in% c("haven_labelled", "factor")){
+
+            # convert in case is from haven
+            a_var <- haven::as_factor(a_var)
+
+            # get basic info
+            n_missing_values <-  sum(is.na(a_var))
+            a_var_options$var_intrvl = "discrete"
+            a_var_options$var_format = list(type = "Factor")
+            a_var_options$var_sumstat = data.frame(value  = c(length(a_var) - n_missing_values, n_missing_values), type = c("vald", "invd"))
+            if(sum(!is.na(a_var), na.rm = TRUE) > 0){ # add min and max if there is at least a value
+                a_var_options$var_val_range = list(min = 1, max = nlevels(a_var))
+            }
+
+            # define first part of categories
+            cat_table <- table(a_var)
+            cat_values <- as.character(1 : nlevels(a_var))
+            cat_labels <- names(cat_table)
+            cat_is_missing <- rep(NA, nlevels(a_var))
+            if(n_missing_values > 0) {
+                cat_values <- c(cat_values, "Missing value")
+                cat_labels <- c(cat_labels, NA)
+                cat_is_missing <- c(cat_is_missing, "Y")
+            }
+
+            # get frequency stats
+            cat_freq <- as.vector(cat_table)
+            cat_freq <- if(n_missing_values > 0){append(cat_freq, n_missing_values)}else{cat_freq}
+            cat_stats <- list()
+            for(a_freq in cat_freq){
+                cat_stats <- c(cat_stats, list(data.frame(value = a_freq, type = "freq", wgtd = NA)))
+            }
+
+            # create options list
+            a_var_options$var_catgry <-
+                data.frame(value = cat_values, labl = cat_labels, is_missing = cat_is_missing)
+            a_var_options$var_catgry$stats <- cat_stats
+        }
+
+        ##### INTEGER
+        if(a_var_class == "integer" || (a_var_class == "numeric" && isTRUE(all.equal(a_var, trunc(a_var))))){
+
+            # get basic info
+            n_missing_values <-  sum(is.na(a_var))
+            a_var_options$var_intrvl = "discrete"
+            a_var_options$var_format = list(type = "Integer")
+            a_var_options$var_sumstat = data.frame(value  = c(length(a_var) - n_missing_values, n_missing_values), type = c("vald", "invd"))
+            if(sum(!is.na(a_var), na.rm = TRUE)){ # add min and max if there is at least a value
+                a_var_options$var_val_range = list(min = min(a_var, na.rm = TRUE), max = max(a_var, na.rm = TRUE))
+            }
+
+            # if there are only few numbers, then show frequency, otherwise not, it would be too many (for example IDs)
+            if(length(unique(a_var)) <= 30) {
+
+                # define first part of categories
+                cat_table <- table(a_var)
+                cat_values <- names(cat_table)
+                cat_labels <- rep(NA, length(cat_values))
+                cat_is_missing <- rep(NA, length(cat_values))
+                if(n_missing_values > 0) {
+                    cat_values <- c(cat_values, "Missing value")
+                    cat_labels <- c(cat_labels, NA)
+                    cat_is_missing <- c(cat_is_missing, "Y")
+                }
+
+                # get frequency stats
+                cat_freq <- as.vector(cat_table)
+                cat_freq <- if(n_missing_values > 0){append(cat_freq, n_missing_values)}else{cat_freq}
+                cat_stats <- list()
+                for(a_freq in cat_freq){
+                    cat_stats <- c(cat_stats, list(data.frame(value = a_freq, type = "freq", wgtd = NA)))
+                }
+
+                # add frequencies to options
+                a_var_options$var_catgry <-
+                    data.frame(value = cat_values, labl = cat_labels, is_missing = cat_is_missing)
+                a_var_options$var_catgry$stats <- cat_stats
+            }
+
+        }
+
+        ##### NUMERIC
+        if(a_var_class == "numeric" && !isTRUE(all.equal(a_var, trunc(a_var))) ){
+
+            # number of decimals to show for mean and st dev
+            number_of_decimals <- 2
+
+            # get basic info
+            n_missing_values <-  sum(is.na(a_var))
+            a_var_options$var_intrvl = "contin"
+            a_var_options$var_format = list(type = "Numeric")
+            if(sum(!is.na(a_var), na.rm = TRUE)){ # add min and max if there is at least a value
+                a_var_options$var_val_range = list(min = min(a_var, na.rm = TRUE), max = max(a_var, na.rm = TRUE))
+            }
+            a_var_options$var_sumstat = data.frame(value  = c(length(a_var) - n_missing_values,
+                                                              n_missing_values,
+                                                              round(mean(a_var, na.rm = TRUE), digits = number_of_decimals),
+                                                              round(sd(a_var, na.rm = TRUE), digits = number_of_decimals)),
+                                                   type = c("vald", "invd", "mean", "stdev"))
+
+        }
+
+        ##### LOGICAL
+        if(a_var_class == "logical"){
+
+            # get basic info
+            n_missing_values <-  sum(is.na(a_var))
+            n_true <- sum(a_var, na.rm = TRUE)
+            n_false <- length(a_var) - n_missing_values - n_true
+
+            a_var_options$var_intrvl = "discrete"
+            a_var_options$var_format = list(type = "Logical")
+            a_var_options$var_sumstat = data.frame(value  = c(length(a_var) - n_missing_values, n_missing_values), type = c("vald", "invd"))
+
+            # define first part of categories
+            cat_table <- table(a_var)
+            cat_values <- c("0", "1")
+            cat_labels <- c("FALSE", "TRUE")
+            cat_is_missing <- rep(NA, 2)
+
+            # get frequency stats
+            cat_stats <- list()
+            cat_stats <- c(cat_stats, list(data.frame(value = n_false, type = "freq", wgtd = NA)))
+            cat_stats <- c(cat_stats, list(data.frame(value = n_true, type = "freq", wgtd = NA)))
+            if(n_missing_values > 0) {
+                cat_values <- c(cat_values, "Missing value")
+                cat_labels <- c(cat_labels, NA)
+                cat_is_missing <- c(cat_is_missing, "Y")
+                cat_stats <- c(cat_stats, list(data.frame(value = n_missing_values, type = "freq", wgtd = NA)))
+            }
+
+            # create options list
+            a_var_options$var_catgry <-
+                data.frame(value = cat_values, labl = cat_labels, is_missing = cat_is_missing)
+            a_var_options$var_catgry$stats <- cat_stats
+
+        }
+
+        # add options to list of all vars options
+        var_options_list <- c(var_options_list, list(a_var_options))
+    }
+
+    # create all vars
+    survey_create_variable(survey_idno = survey_idno,
+                           file_id = file_id,
+                           var_metadata = var_options_list)
+
+}
+
+
+
+###test
+# xxx <- mdl_create_vars_from_dataframe(survey_idno = test_survey_idno,
+#                                       data_frame = test_dta,
+#                                       file_id = "hh3",
+#                                       file_name = "hh3",
+#                                       file_description = "This file contains...")
+#
+#
+# mdl_create_vars_from_dta(survey_idno = test_survey_idno, file_path = "UNHCR_KEN_2018_LIS_data_v1.1.dta", file_name = "kenya lis", file_description = "kenya lis data file")
+#
+#
+# xxx2 <- read.csv("test.csv")
+# xxx2$var_factor <- as.factor(xxx2$var_factor)
+# xxx2$var_integer <- c(1,1,1,2,NA)
+# xxx2$var_logical <- c(F,NA,T,F,F)
+# labelled::var_label(xxx2$var_integer) <- "integer label"
+# xxx3 <- mdl_create_vars_from_dataframe(survey_idno = test_survey_idno,
+#                                        data_frame = xxx2,
+#                                        file_id = "hh5_v21dta",
+#                                        file_name = "hh5 v2.1",
+#                                        file_description = "This file contains data from dataframe...")
+#
+#
+#
+# test_lis <- haven::read_dta("UNHCR_ZMB_2018_LIS_data_v1.1.dta")
+# test_lis_call <- mdl_create_vars_from_dataframe(survey_idno = "test_LIS",
+#                                                 data_frame = test_lis,
+#                                                 file_id = "hh",
+#                                                 file_name = "Households",
+#                                                 file_description = "This file contains household data")
+#
+#
+# test_vasyr <- haven::read_dta("UNHCR_LBN_2020_VASYR_data_household_v2.1.dta")
+# test_vasyr_call <- mdl_create_vars_from_dataframe(survey_idno = test_survey_idno,
+#                                                   data_frame = test_vasyr,
+#                                                   file_id = "hh_vasyr",
+#                                                   file_name = "hh vasyr",
+#                                                   file_description = "This file contains household vasyr data")
+#
+#
+# table(haven::as_factor( test_dta$var_factor))
+#
+#
+# class(test_dta$var_character)[1]
+# class(test_dta$var_factor)[1]
+#
+# c(as.vector(table(haven::as_factor(test_dta$var_factor))), 4)
+#
+#
+#
+# all(test_dta$var_integer == trunc(test_dta$var_integer))
+# all(test_dta$var_numeric == trunc(test_dta$var_numeric))
+# all(test_dta$var_logical == trunc(test_dta$var_logical))
+#
+#
+# isTRUE(all.equal(test_dta$var_integer, trunc(test_dta$var_integer)))
+# isTRUE(all.equal(test_dta$var_numeric, trunc(test_dta$var_numeric)))
+# isTRUE(all.equal(test_dta$var_logical, trunc(test_dta$var_logical)))
+#
+# isTRUE(all.equal(a_var, trunc(a_var)))
+#
+# all(test_dta$var_numeric == trunc(test_dta$var_numeric))
+
