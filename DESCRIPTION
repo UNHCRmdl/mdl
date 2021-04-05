@@ -18,6 +18,8 @@ Imports:
     jsonlite,
     labelled,
     haven,
-    nadar
+    nadar,
+	exampleRPackage
 Remotes: 
-    mah0001/nadar
+    mah0001/nadar,
+	mvuorre/exampleRPackage
