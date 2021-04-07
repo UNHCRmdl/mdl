@@ -13,7 +13,7 @@
 # Once you’ve got your documentation completed, you can simply run:
 # devtools::document()
 # devtools::load_all()
-#
+# devtools::install()
 
 
 # UNHCRmdl::mdl_enum_api_url$production
