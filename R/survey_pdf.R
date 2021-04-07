@@ -1,5 +1,16 @@
-
-# Create the documentation pdf from the survey metadata and link a resource to it
+# TODO: true and false nstead of 1 and 0
+#' Create documentation PDF
+#'
+#' This function creates the documentation PDF from the survey metadata and links a resource to it.
+#'
+#' @return API call response.
+#'
+#' @param survey_idno The identifier of the survey for which you want to generate the PDF, e.g.: UNHCR_ETH_2020_SENS_v2.1
+#' @param resource_title The title of the resource linked to the file. Default is "Documentation".
+#' @param variable_list Specifies if the PDF should include the variable list: 1 for yes, 0 for no.
+#' @param variable_description Specifies if the PDF should include the variable description: 1 for yes, 0 for no.
+#' @param external_resource Specifies if the PDF should include the external resources: 1 for yes, 0 for no.
+#'
 #' @export
 mdl_survey_generate_pdf <- function(survey_idno,
                                     resource_title = "Documentation",
@@ -31,7 +42,7 @@ mdl_survey_generate_pdf <- function(survey_idno,
     }
 }
 
-# Create the documentation pdf from the survey metadata
+# Create the documentation pdf from the survey metadata.
 survey_generate_pdf <- function(
     survey_idno,
     variable_toc = 0,

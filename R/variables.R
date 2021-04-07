@@ -139,9 +139,21 @@ survey_create_variable <- function(
 
 #########
 
-# Create a file with all variables metadata starting from a stata .dta file
+#' Create variables metadata from dta file
+#'
+#' Starting from a Stata file (.dta), this function will create the variables metadata for a given survey.
+#' The function will calculate for each variable the main stats and get the variable labels when available.
+#'
+#' @return API call response.
+#'
+#' @param survey_idno The unique identifier of an existing survey, e.g.: UNHCR_ETH_2020_SENS_v2.1
+#' @param file_path Path to the dta file, e.g.: C:/path/to/file.dta
+#' @param file_id An unique identifier for the file containing the variables metadata. If not provided, the name of the file will be used. If provided, the ID should only include alphanumeric chars. This ID is not shown in the platform, it is mostly used for fetching or modifying the metadata in a second moment.
+#' @param file_name The name of the file containing the variables as you want it to be shown in the platform to the final user.
+#' @param file_description Brief description of the file, as you want it to be shown in the platform to the final user.
+#'
 #' @export
-mdl_create_vars_from_dta <- function(survey_idno, file_path, file_id = NA, file_name, file_description){
+mdl_vars_create_from_dta <- function(survey_idno, file_path, file_id = NA, file_name, file_description){
 
     # if file id not provided, uses the name of the file
     if(is.na(file_id)){
@@ -154,10 +166,23 @@ mdl_create_vars_from_dta <- function(survey_idno, file_path, file_id = NA, file_
     mdl_create_vars_from_dataframe(survey_idno = survey_idno, data_frame = data_frame, file_id = file_id, file_name = file_name, file_description = file_description)
 }
 
-# Create a file with all variables metadata starting from a data frame
-# Labels must be set with labelled::var_label or the data frame must be imported from a Stata file using haven::read_dta
+
+#' Create variables metadata from a data frame
+#'
+#' Starting from a data frame, this function will create the variables metadata for a given survey.
+#' The function will calculate for each variable the main stats and get the variable labels when available.
+#' Labels must be set to the data frame using the labelled::var_label function or the data frame must be imported from a Stata file using the haven::read_dta function.
+#'
+#' @return API call response.
+#'
+#' @param survey_idno The unique identifier of an existing survey, e.g.: UNHCR_ETH_2020_SENS_v2.1
+#' @param data_frame A data frame containing the data.
+#' @param file_id An unique identifier for the file containing the variables metadata. If not provided, the name of the file will be used. If provided, the ID should only include alphanumeric chars. This ID is not shown in the platform, it is mostly used for fetching or modifying the metadata in a second moment.
+#' @param file_name The name of the file containing the variables as you want it to be shown in the platform to the final user.
+#' @param file_description Brief description of the file, as you want it to be shown in the platform to the final user.
+#'
 #' @export
-mdl_create_vars_from_dataframe <- function(survey_idno, data_frame, file_id, file_name, file_description){
+mdl_vars_create_from_dataframe <- function(survey_idno, data_frame, file_id, file_name, file_description){
 
     #create data file that will contain the variables
     survey_create_data_file(
@@ -172,7 +197,7 @@ mdl_create_vars_from_dataframe <- function(survey_idno, data_frame, file_id, fil
     # iterate over variables
     var_options_list <- list()
     for(i in 1:ncol(data_frame)){
-        print(i)
+        #print(i)
 
         # get basic info
         a_var <- data_frame[[i]]

@@ -11,6 +11,7 @@ mdl_enum_api_url <- list(
 )
 
 # repository code for creating dataset
+#' @export
 mdl_enum_catalog <- list(
     Europe = "EURO",
     Americas = "SA",
@@ -22,6 +23,7 @@ mdl_enum_catalog <- list(
 )
 
 # list of possible ways to publish the data files
+#' @export
 mdl_enum_survey_access_policy <- list(
     "Licensed use files" = "licensed",
     "Public use file" = "public",
@@ -34,6 +36,7 @@ mdl_enum_survey_access_policy <- list(
 
 
 # study type for survey metadata
+#' @export
 mdl_enum_survey_study_type <- list(
     "1-2-3 Survey, phase 1 [hh/123-1]" = "1-2-3 Survey, phase 1 [hh/123-1]",
     "1-2-3 Survey, phase 2 [hh/123-2]" = "1-2-3 Survey, phase 2 [hh/123-2]",
@@ -77,6 +80,7 @@ mdl_enum_survey_study_type <- list(
 )
 
 # kind of data for survey metadata
+#' @export
 mdl_enum_survey_kind_of_data <- list(
     "Sample survey data [ssd]" = "Sample survey data [ssd]",
     "Census/enumeration data [cen]" = "Census/enumeration data [cen]",
@@ -90,6 +94,7 @@ mdl_enum_survey_kind_of_data <- list(
 )
 
 # topics for survey metadata
+#' @export
 mdl_enum_survey_topics <- list(
     "Health and Nutrition" = "Health and Nutrition",
     "Health" = "Health",
@@ -151,6 +156,7 @@ mdl_enum_survey_topics <- list(
 )
 
 # collection mode for survey metadata
+#' @export
 mdl_enum_survey_collection_mode <- list(
     "Computer Assisted Personal Interview [capi]" = "Computer Assisted Personal Interview [capi]",
     "Computer Assisted Telephone Interview [cati]" = "Computer Assisted Telephone Interview [cati]",
@@ -162,6 +168,7 @@ mdl_enum_survey_collection_mode <- list(
 )
 
 # list of possible types of resources
+#' @export
 mdl_enum_resource_type <- list(
     doc_administrative = "doc/adm",
     doc_analytical = "doc/anl",
@@ -174,6 +181,7 @@ mdl_enum_resource_type <- list(
 )
 
 # list of country names given ISO code
+#' @export
 mdl_enum_country <- list(
     AFG = "Afghanistan",
     ALB = "Albania",

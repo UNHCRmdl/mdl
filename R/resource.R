@@ -1,10 +1,21 @@
-
-# Upload a file and create a resource
+# TODO check if creating a resource twice will duplicate the resource
+#' Upload a file and create a resource
+#'
+#' This function first uploads a file for a given survey, than creates a resource and link it to the uploaded file.
+#'
+#' @return API call response.
+#'
+#' @param survey_idno The unique identifier of an existing survey, e.g.: UNHCR_ETH_2020_SENS_v2.1
+#' @param file_path Path to the file to upload, e.g.: C:/path/to/file.pdf
+#' @param enum_resource_type The type of resource. We recommend to use the corresponding enumerator, e.g.: mdl_enum_resource_type$doc_report
+#' @param resource_title Title of the resource as shown in the platform to the final user.
+#' @param resource_description Brief description of the resource as shown in the platform to the final user.
+#'
 #' @export
-mdl_survey_upload_resource <- function(survey_idno, file_path, enum_resource_type, resource_title, resource_description = NULL){
+mdl_resource_upload <- function(survey_idno, file_path, enum_resource_type, resource_title, resource_description = NULL){
 
     # upload file
-    external_resources_upload_response <- nadar::external_resources_upload(dataset_idno = survey_idno, file = file_path)
+    external_resources_upload_response <- survey_resource_upload(dataset_idno = survey_idno, file = file_path)
 
     # if successful, create a resource
     if(external_resources_upload_response$status == "success"){
@@ -19,6 +30,38 @@ mdl_survey_upload_resource <- function(survey_idno, file_path, enum_resource_typ
     }else {
         return(external_resources_upload_response)
     }
+}
+
+# upload file, taken from Nadar, rewritten because of small issue
+survey_resource_upload <- function(
+    dataset_idno,
+    resource_id=NULL,
+    file,
+    api_key=NULL,
+    api_base_url=NULL){
+
+    endpoint=paste0('datasets/',dataset_idno,'/files')
+
+    if(is.null(api_key)){
+        api_key=nadar::get_api_key();
+    }
+
+    url=nadar::get_api_url(endpoint)
+
+    options=list(
+        "file"=httr::upload_file(file)
+    )
+
+    httpResponse <- httr::POST(url, httr::add_headers("X-API-KEY" = api_key),body=options, httr::accept_json())
+    output=NULL
+
+    if(httpResponse$status_code!=200){
+        warning(httr::content(httpResponse, "text"))
+    }else{
+        output=jsonlite::fromJSON(httr::content(httpResponse,"text"))
+    }
+
+    return (output)
 }
 
 # Create a resource linked to a previously uploaded file

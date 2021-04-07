@@ -1,5 +1,5 @@
 Package: mdl
-Title: R package for working with UNHCR Microdata Library APIs
+Title: R client for UNHCR Microdata Library
 Version: 1.0
 Authors@R: 
     person(given = "Federico",
@@ -18,8 +18,6 @@ Imports:
     jsonlite,
     labelled,
     haven,
-    nadar,
-	exampleRPackage
+    nadar
 Remotes: 
-    mah0001/nadar,
-	mvuorre/exampleRPackage
+    mah0001/nadar
