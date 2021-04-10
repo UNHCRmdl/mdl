@@ -28,10 +28,10 @@ mdl_survey_generate_pdf <- function(survey_idno,
     )
 
     # if successful, link a resource
-    if(survey_generate_pdf_response$status_code == 200){
-        survey_resource_add (
+    if(identical(survey_generate_pdf_response$status, "success")){
+        mdl_resource_add (
             survey_idno = survey_idno,
-            filename = basename(survey_generate_pdf_response$response$output),
+            filename = basename(survey_generate_pdf_response$output),
             dctype = "doc/tec",
             title = resource_title,
             dcformat = "application/pdf",
@@ -48,18 +48,8 @@ survey_generate_pdf <- function(
     variable_toc = 0,
     variable_description = 0,
     include_resources = 0,
-    language = "en", # "fr", "ar"
-    api_key = NULL,
-    api_base_url = NULL
+    language = "en" # "fr", "ar"
 ){
-
-    # get api key and url if not specified
-    if(is.null(api_key)){
-        api_key=nadar::get_api_key();
-    }
-    if(is.null(api_base_url)){
-        api_base_url=nadar::get_api_url();
-    }
 
     # specify call options
     options <- list(
@@ -70,28 +60,27 @@ survey_generate_pdf <- function(
     )
 
     # specify url
-    url <-  paste(api_base_url, "datasets", "generate_pdf", survey_idno, sep = "/")
+    url <-  paste(mdl_api_get_url(), "datasets", "generate_pdf", survey_idno, sep = "/")
 
     # call API
     httpResponse <- httr::POST(url,
-                               httr::add_headers("X-API-KEY" = api_key),
+                               httr::add_headers("X-API-KEY" = mdl_api_get_key()),
                                body = options,
                                encode = "json"
     )
 
-    # print error if any
-    if(httpResponse$status_code!=200){
-        warning(httr::content(httpResponse, "text"))
+    response_content <- httr::content(httpResponse, "text")
+
+    output <- jsonlite::fromJSON(response_content)
+    if(!is.list(output)){
+        output <- list(output)
     }
 
+    if(httpResponse$status_code!=200){
+        warning(response_content)
+    }
 
-    # return output
-    output <- list(
-        status_code = httpResponse$status_code,
-        response = jsonlite::fromJSON(httr::content(httpResponse,"text"))
-    )
-
-    return(output)
+    return (output)
 }
 
 ## test

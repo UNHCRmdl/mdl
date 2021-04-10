@@ -1,5 +1,5 @@
 # TODO check if creating a resource twice will duplicate the resource
-#' Upload a file and create a resource
+#' Upload a file and create a resource linked to it
 #'
 #' This function first uploads a file for a given survey, than creates a resource and link it to the uploaded file.
 #'
@@ -12,60 +12,61 @@
 #' @param resource_description Brief description of the resource as shown in the platform to the final user.
 #'
 #' @export
-mdl_resource_upload <- function(survey_idno, file_path, enum_resource_type, resource_title, resource_description = NULL){
+mdl_resource_upload_file_and_link <- function(survey_idno, file_path, enum_resource_type, resource_title, resource_description = NULL){
 
     # upload file
-    external_resources_upload_response <- survey_resource_upload(dataset_idno = survey_idno, file = file_path)
+    upload_file_response <- mdl_resource_upload_file(survey_idno = survey_idno, file_path = file_path)
 
     # if successful, create a resource
-    if(external_resources_upload_response$status == "success"){
-        survey_resource_add (
+    if(identical(upload_file_response$status, "success")){
+        mdl_resource_add (
             survey_idno = survey_idno,
-            filename = basename(file_path),
+            filename = upload_file_response$uploaded_file_name,
             dctype = enum_resource_type,
             title = resource_title,
             #dcformat = "",
             description = resource_description
         )
     }else {
-        return(external_resources_upload_response)
+        return(upload_file_response)
     }
 }
 
-# upload file, taken from Nadar, rewritten because of small issue
-survey_resource_upload <- function(
-    dataset_idno,
-    resource_id=NULL,
-    file,
-    api_key=NULL,
-    api_base_url=NULL){
+# upload file for a survey
+mdl_resource_upload_file <- function(
+    survey_idno,
+    file_path,
+    resource_id = NULL
+    ){
 
-    endpoint=paste0('datasets/',dataset_idno,'/files')
+    url <- paste(mdl_api_get_url(), "datasets", survey_idno, "files", sep = "/")
 
-    if(is.null(api_key)){
-        api_key=nadar::get_api_key();
-    }
-
-    url=nadar::get_api_url(endpoint)
-
-    options=list(
-        "file"=httr::upload_file(file)
+    options <- list(
+        "file" = httr::upload_file(file_path)
     )
 
-    httpResponse <- httr::POST(url, httr::add_headers("X-API-KEY" = api_key),body=options, httr::accept_json())
-    output=NULL
+    httpResponse <- httr::POST(url,
+                               httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                               body = options
+                               #encode = "json"
+                               )
+
+    response_content <- httr::content(httpResponse, "text")
+
+    output <- jsonlite::fromJSON(response_content)
+    if(!is.list(output)){
+        output <- list(output)
+    }
 
     if(httpResponse$status_code!=200){
-        warning(httr::content(httpResponse, "text"))
-    }else{
-        output=jsonlite::fromJSON(httr::content(httpResponse,"text"))
+        warning(response_content)
     }
 
     return (output)
 }
 
 # Create a resource linked to a previously uploaded file
-survey_resource_add <- function(
+mdl_resource_add <- function(
     survey_idno,
     filename,
     dctype,
@@ -80,18 +81,8 @@ survey_resource_add <- function(
     publisher = NULL,
     rights = NULL,
     abstract = NULL,
-    toc = NULL,
-    api_key = NULL,
-    api_base_url = NULL
+    toc = NULL
 ){
-
-    # get api key and url if not specified
-    if(is.null(api_key)){
-        api_key=nadar::get_api_key();
-    }
-    if(is.null(api_base_url)){
-        api_base_url=nadar::get_api_url();
-    }
 
     # specify call options
     options <- list(
@@ -113,28 +104,27 @@ survey_resource_add <- function(
     )
 
     # specify url
-    url <-  paste(api_base_url, "datasets", survey_idno, "resources", sep = "/")
+    url <-  paste(mdl_api_get_url(), "datasets", survey_idno, "resources", sep = "/")
 
     # call API
     httpResponse <- httr::POST(url,
-                               httr::add_headers("X-API-KEY" = api_key),
+                               httr::add_headers("X-API-KEY" = mdl_api_get_key()),
                                body = options,
                                encode = "json"
     )
 
-    # print error if any
-    if(httpResponse$status_code!=200){
-        warning(httr::content(httpResponse, "text"))
+    response_content <- httr::content(httpResponse, "text")
+
+    output <- jsonlite::fromJSON(response_content)
+    if(!is.list(output)){
+        output <- list(output)
     }
 
+    if(httpResponse$status_code!=200){
+        warning(response_content)
+    }
 
-    # return output
-    output <- list(
-        status_code = httpResponse$status_code,
-        response = jsonlite::fromJSON(httr::content(httpResponse,"text"))
-    )
-
-    return(output)
+    return (output)
 }
 
 

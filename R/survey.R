@@ -200,7 +200,6 @@ mdl_survey_generate_metadata_list <- function(
 
 # create a survey from metadata
 # TODO: check data_remote_url: it is in NADAR but does not work
-# TODO: add function to fetch list of catalogs
 #
 #' Create survey from metadata list
 #'
@@ -209,16 +208,16 @@ mdl_survey_generate_metadata_list <- function(
 #' @return API call response
 #'
 #' @param survey_metadata_list A list containing the metadata. We recommend to create the list using the function mdl_survey_generate_metadata_list.
-#' @param enum_catalog The ID of the catalog where the survey will be created. You can use the corresponding enumerator, e.g.: mdl_enum_catalog$WestAfrica
+#' @param enum_collection The ID of the collection where the survey will be created. To see an up to date list of collections call mdl_collection_list().You can also use the corresponding enumerator, e.g.: mdl_enum_collection$WestAfrica
 #' @param enum_survey_access_policy Specifies the access level to the data files. You can use the corresponding enumerator, e.g.: mdl_enum_survey_access_policy$'Licensed use files'
 #' @param published The survey status: FALSE for draft, TRUE for published.
 #' @param overwrite Specifies if the survey will be overwritten in case it already exists: FALSE for not overwriting, TRUE for overwriting. If a survey with the same idno already exists and the argument is set to FALSE, the survey will not change and an error will be returned.
 #'
 #' @export
-mdl_survey_create <- function(survey_metadata_list, enum_catalog, enum_survey_access_policy, published = FALSE, overwrite = FALSE){
+mdl_survey_create <- function(survey_metadata_list, enum_collection, enum_survey_access_policy, published = FALSE, overwrite = FALSE){
 
     # define parameters
-    a_metadata_idno = survey_metadata_list$study_desc$title_statement$idno # this is probably not needed but required by nadar
+    a_metadata_idno = survey_metadata_list$study_desc$title_statement$idno # this is probably not needed but required in the documentation
     opt_published <- as.numeric(published)
     opt_overwrite <-  "no"
     if(overwrite){
@@ -229,7 +228,7 @@ mdl_survey_create <- function(survey_metadata_list, enum_catalog, enum_survey_ac
     response <- survey_create(type = "survey",
                               idno = a_metadata_idno,
                               metadata = survey_metadata_list,
-                              repositoryid = enum_catalog,
+                              repositoryid = enum_collection,
                               access_policy = enum_survey_access_policy,
                               published = opt_published,
                               overwrite = opt_overwrite
@@ -238,7 +237,7 @@ mdl_survey_create <- function(survey_metadata_list, enum_catalog, enum_survey_ac
     return(response)
 }
 
-# nadar::create but calling explicity the functions
+# generic creation function, can be used also for other entities: survey, geospatial, table, document, timeseries
 survey_create <- function(
     type,
     idno,
@@ -248,15 +247,12 @@ survey_create <- function(
     data_remote_url=NULL,
     published=NULL,
     overwrite=NULL,
-    thumbnail=NULL,
-    api_key=NULL,
-    api_base_url=NULL){
+    thumbnail=NULL
+    ){
 
-    if(is.null(api_key)){
-        api_key=nadar::get_api_key();
-    }
+    api_key <- mdl_api_get_key()
 
-    options=list(
+    options <- list(
         "idno"=idno,
         "repositoryid"=repositoryid,
         "access_policy"=access_policy,
@@ -265,45 +261,40 @@ survey_create <- function(
         "overwrite"=overwrite
     )
 
-    options= c(options,metadata)
+    options <- c(options,metadata)
 
-    url=nadar::get_api_url(paste0('datasets/create/',type,'/',idno))
+    url <- paste(mdl_api_get_url(), "datasets", "create", type, idno, sep = "/" )
+
     httpResponse <- httr::POST(url,
                                httr::add_headers("X-API-KEY" = api_key),
                          body=options,
-                         httr::content_type_json(),
-                         encode="json",
-                         httr::accept_json()
+                         #httr::content_type_json(),
+                         encode="json"
                          )
 
-    output=NULL
+
+    #thumbnail_result=NULL
+
+    # #upload thumbnail
+    # if(!is.null(thumbnail) && file.exists(thumbnail)) {
+    #     thumbnail_result=thumbnail_upload(idno=idno,thumbnail = thumbnail)
+    # }
+    #
+    # #set default thumbnail
+    # if(!is.null(thumbnail) && thumbnail == 'default'){
+    #     thumbnail_result= thumbnail_delete(idno=idno)
+    # }
+
+    response_content <- httr::content(httpResponse, "text")
 
     if(httpResponse$status_code!=200){
-        warning(content(httpResponse, "text"))
+        warning(response_content)
     }
 
-    thumbnail_result=NULL
-
-    #upload thumbnail
-    if(!is.null(thumbnail) && file.exists(thumbnail)) {
-        thumbnail_result=thumbnail_upload(idno=idno,thumbnail = thumbnail)
-    }
-
-    #set default thumbnail
-    if(!is.null(thumbnail) && thumbnail == 'default'){
-        thumbnail_result= thumbnail_delete(idno=idno)
-    }
-
-    output=list(
-        "status_code"=httpResponse$status_code,
-        "response"=jsonlite::fromJSON(httr::content(httpResponse,"text")),
-        "thumbnail"=thumbnail_result
-    )
+    output <- jsonlite::fromJSON(response_content)
 
     return (output)
 }
-
-
 
 
 
@@ -337,4 +328,42 @@ survey_create <- function(
 #     contacts_list = list(list(name = "Curation team", affiliation = "UNHCR", email = "microdata@unhcr.org"),
 #                          list(name = "Curation team2", affiliation = "UNHCR2", email = "microdata2@unhcr.org"))
 # )
-# a_survey_metadata_create_response <- nadar::create("survey", "bbb", a_survey_metadata, overwrite = "yes", published = 0)
+
+
+
+
+
+
+
+
+
+#' Get a survey given an idno
+#'
+#' Given an unique idno, it return a survey and its metadata
+#'
+#' @return API call response.
+#'
+#' @param survey_idno Survey unique identifier
+#'
+#' @export
+mdl_survey_get <- function(survey_idno){
+
+    url <- paste(mdl_api_get_url(), 'datasets', survey_idno, sep = "/")
+
+    httpResponse <- httr::GET(url,
+                              httr::add_headers("X-API-KEY" = mdl_api_get_key())
+                              )
+
+    response_content <- httr::content(httpResponse, "text")
+
+    if(httpResponse$status_code!=200){
+        warning(response_content)
+    }
+
+    output <- jsonlite::fromJSON(response_content)
+
+    return (output)
+}
+
+
+

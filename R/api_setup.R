@@ -20,7 +20,7 @@ mdl_api_open_documentation <- function(){
 #' @param api_key The API key.
 #' @export
 mdl_api_set_key <-  function(api_key){
-    nadar::set_api_key(api_key)
+    Sys.setenv("MDL_API_KEY" = api_key)
 }
 
 #' Set API URL
@@ -30,7 +30,32 @@ mdl_api_set_key <-  function(api_key){
 #' @param enum_api_url The API base endpoint URL. We recommend to use the related enumerator, e.g.: mdl_enum_api_url$uat
 #' @export
 mdl_api_set_url <- function(enum_api_url){
-    nadar::set_api_url(enum_api_url)
+    Sys.setenv("MDL_API_URL" = enum_api_url)
 }
+
+
+# Get API key
+mdl_api_get_key <-  function(){
+    api_key <- Sys.getenv("MDL_API_KEY")
+    if(is.null(api_key) || api_key == ""){
+        stop("API key was not set, use mdl_api_set_key()")
+        return(NULL)
+    }
+    return(api_key)
+}
+
+# Get API url
+mdl_api_get_url <-  function(){
+    api_url <- Sys.getenv("MDL_API_URL")
+    if(is.null(api_url) || api_url == ""){
+        stop("API URL was not set, use mdl_api_set_url()")
+        return(NULL)
+    }
+    return(api_url)
+}
+
+
+
+
 
 

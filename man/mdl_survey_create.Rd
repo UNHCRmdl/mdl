@@ -6,7 +6,7 @@
 \usage{
 mdl_survey_create(
   survey_metadata_list,
-  enum_catalog,
+  enum_collection,
   enum_survey_access_policy,
   published = FALSE,
   overwrite = FALSE
@@ -15,7 +15,7 @@ mdl_survey_create(
 \arguments{
 \item{survey_metadata_list}{A list containing the metadata. We recommend to create the list using the function mdl_survey_generate_metadata_list.}
 
-\item{enum_catalog}{The ID of the catalog where the survey will be created. You can use the corresponding enumerator, e.g.: mdl_enum_catalog$WestAfrica}
+\item{enum_collection}{The ID of the collection where the survey will be created. To see an up to date list of collections call mdl_collection_list().You can also use the corresponding enumerator, e.g.: mdl_enum_collection$WestAfrica}
 
 \item{enum_survey_access_policy}{Specifies the access level to the data files. You can use the corresponding enumerator, e.g.: mdl_enum_survey_access_policy$'Licensed use files'}
 

@@ -10,18 +10,8 @@ survey_create_data_file <- function(
     data_checks = NULL,
     missing_data = NULL,
     version = NULL,
-    notes = NULL,
-    api_key = NULL,
-    api_base_url = NULL
+    notes = NULL
 ){
-
-    # get api key and url if not specified
-    if(is.null(api_key)){
-        api_key=nadar::get_api_key();
-    }
-    if(is.null(api_base_url)){
-        api_base_url=nadar::get_api_url();
-    }
 
     # specify call options
     options = list(
@@ -38,28 +28,27 @@ survey_create_data_file <- function(
     )
 
     # specify url
-    url <-  paste(api_base_url, "datasets", "datafiles", survey_idno, sep = "/")
+    url <-  paste(mdl_api_get_url(), "datasets", "datafiles", survey_idno, sep = "/")
 
     # call API
     httpResponse <- httr::POST(url,
-                               httr::add_headers("X-API-KEY" = api_key),
+                               httr::add_headers("X-API-KEY" = mdl_api_get_key()),
                                body = options,
                                encode = "json"
     )
 
-    # print error if any
-    if(httpResponse$status_code!=200){
-        warning(httr::content(httpResponse, "text"))
+    response_content <- httr::content(httpResponse, "text")
+
+    output <- jsonlite::fromJSON(response_content)
+    if(!is.list(output)){
+        output <- list(output)
     }
 
+    if(httpResponse$status_code!=200){
+        warning(response_content)
+    }
 
-    # return output
-    output <- list(
-        status_code = httpResponse$status_code,
-        response = jsonlite::fromJSON(httr::content(httpResponse,"text"))
-    )
-
-    return(output)
+    return (output)
 }
 
 ### test
@@ -77,45 +66,34 @@ survey_create_data_file <- function(
 survey_create_variable <- function(
     survey_idno,
     file_id,
-    var_metadata,
-    api_key = NULL,
-    api_base_url = NULL
+    var_metadata
 ){
-
-    # get api key and url if not specified
-    if(is.null(api_key)){
-        api_key=nadar::get_api_key();
-    }
-    if(is.null(api_base_url)){
-        api_base_url=nadar::get_api_url();
-    }
 
     # specify call options
     options <- var_metadata
 
     # specify url
-    url <-  paste(api_base_url, "datasets", "variables", survey_idno, file_id, sep = "/")
+    url <-  paste(mdl_api_get_url(), "datasets", "variables", survey_idno, file_id, sep = "/")
 
     # call API
     httpResponse <- httr::POST(url,
-                               httr::add_headers("X-API-KEY" = api_key),
+                               httr::add_headers("X-API-KEY" = mdl_api_get_key()),
                                body = options,
                                encode = "json"
     )
 
-    # print error if any
-    if(httpResponse$status_code!=200){
-        warning(httr::content(httpResponse, "text"))
+    response_content <- httr::content(httpResponse, "text")
+
+    output <- jsonlite::fromJSON(response_content)
+    if(!is.list(output)){
+        output <- list(output)
     }
 
+    if(httpResponse$status_code!=200){
+        warning(response_content)
+    }
 
-    # return output
-    output <- list(
-        status_code = httpResponse$status_code,
-        response = jsonlite::fromJSON(httr::content(httpResponse,"text"))
-    )
-
-    return(output)
+    return (output)
 }
 
 ###TEST
@@ -163,7 +141,7 @@ mdl_vars_create_from_dta <- function(survey_idno, file_path, file_id = NA, file_
     }
 
     data_frame <- haven::read_dta(file_path)
-    mdl_create_vars_from_dataframe(survey_idno = survey_idno, data_frame = data_frame, file_id = file_id, file_name = file_name, file_description = file_description)
+    mdl_vars_create_from_dataframe(survey_idno = survey_idno, data_frame = data_frame, file_id = file_id, file_name = file_name, file_description = file_description)
 }
 
 
