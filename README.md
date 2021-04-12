@@ -96,7 +96,7 @@ Secondly, pass the metadata list to the mdl_survey_create function to create a s
 # create the survey passing the metadata list
 a_response <- mdl_survey_create(
     survey_metadata_list = a_survey_metadata,
-    enum_catalog = mdl_enum_catalog$EastAfrica,
+    enum_collection = mdl_enum_collection$EastAfrica,
     enum_survey_access_policy = mdl_enum_survey_access_policy$`Licensed use files`,
     published = FALSE,
     overwrite = FALSE
@@ -140,7 +140,7 @@ Please note that the resource files set as microdata are accessible accordingly 
 write.csv(iris, "test_file.csv")
 
 # upload a file and create a resource linked to it
-a_response <- mdl_resource_upload(
+a_response <- mdl_resource_upload_file_and_link(
     survey_idno = "UNHCR_ETH_2021_TEST_v2.1",
     file_path = "test_file.csv",
     enum_resource_type = mdl_enum_resource_type$microdata,
