@@ -219,7 +219,7 @@ mdl_vars_create_from_dataframe <- function(survey_idno, data_frame, file_id, fil
             cat_table <- table(a_var)
             cat_values <- as.character(1 : nlevels(a_var))
             cat_labels <- names(cat_table)
-            cat_is_missing <- rep(NA, nlevels(a_var))
+            cat_is_missing <- rep("", nlevels(a_var))
             if(n_missing_values > 0) {
                 cat_values <- c(cat_values, "Missing value")
                 cat_labels <- c(cat_labels, NA)
@@ -231,7 +231,7 @@ mdl_vars_create_from_dataframe <- function(survey_idno, data_frame, file_id, fil
             cat_freq <- if(n_missing_values > 0){append(cat_freq, n_missing_values)}else{cat_freq}
             cat_stats <- list()
             for(a_freq in cat_freq){
-                cat_stats <- c(cat_stats, list(data.frame(value = a_freq, type = "freq", wgtd = NA)))
+                cat_stats <- c(cat_stats, list(data.frame(value = a_freq, type = "freq", wgtd = 0)))
             }
 
             # create options list
@@ -259,7 +259,7 @@ mdl_vars_create_from_dataframe <- function(survey_idno, data_frame, file_id, fil
                 cat_table <- table(a_var)
                 cat_values <- names(cat_table)
                 cat_labels <- rep(NA, length(cat_values))
-                cat_is_missing <- rep(NA, length(cat_values))
+                cat_is_missing <- rep("", length(cat_values))
                 if(n_missing_values > 0) {
                     cat_values <- c(cat_values, "Missing value")
                     cat_labels <- c(cat_labels, NA)
@@ -271,12 +271,11 @@ mdl_vars_create_from_dataframe <- function(survey_idno, data_frame, file_id, fil
                 cat_freq <- if(n_missing_values > 0){append(cat_freq, n_missing_values)}else{cat_freq}
                 cat_stats <- list()
                 for(a_freq in cat_freq){
-                    cat_stats <- c(cat_stats, list(data.frame(value = a_freq, type = "freq", wgtd = NA)))
+                    cat_stats <- c(cat_stats, list(data.frame(value = a_freq, type = "freq", wgtd = 0)))
                 }
 
                 # add frequencies to options
-                a_var_options$var_catgry <-
-                    data.frame(value = cat_values, labl = cat_labels, is_missing = cat_is_missing)
+                a_var_options$var_catgry <- data.frame(value = cat_values, labl = cat_labels, is_missing = cat_is_missing)
                 a_var_options$var_catgry$stats <- cat_stats
             }
 
@@ -319,22 +318,21 @@ mdl_vars_create_from_dataframe <- function(survey_idno, data_frame, file_id, fil
             cat_table <- table(a_var)
             cat_values <- c("0", "1")
             cat_labels <- c("FALSE", "TRUE")
-            cat_is_missing <- rep(NA, 2)
+            cat_is_missing <- rep("", 2)
 
             # get frequency stats
             cat_stats <- list()
-            cat_stats <- c(cat_stats, list(data.frame(value = n_false, type = "freq", wgtd = NA)))
-            cat_stats <- c(cat_stats, list(data.frame(value = n_true, type = "freq", wgtd = NA)))
+            cat_stats <- c(cat_stats, list(data.frame(value = n_false, type = "freq", wgtd = 0)))
+            cat_stats <- c(cat_stats, list(data.frame(value = n_true, type = "freq", wgtd = 0)))
             if(n_missing_values > 0) {
                 cat_values <- c(cat_values, "Missing value")
                 cat_labels <- c(cat_labels, NA)
                 cat_is_missing <- c(cat_is_missing, "Y")
-                cat_stats <- c(cat_stats, list(data.frame(value = n_missing_values, type = "freq", wgtd = NA)))
+                cat_stats <- c(cat_stats, list(data.frame(value = n_missing_values, type = "freq", wgtd = 0)))
             }
 
-            # create options list
-            a_var_options$var_catgry <-
-                data.frame(value = cat_values, labl = cat_labels, is_missing = cat_is_missing)
+            #create options list
+            a_var_options$var_catgry <- data.frame(value = cat_values, labl = cat_labels, is_missing = cat_is_missing)
             a_var_options$var_catgry$stats <- cat_stats
 
         }
@@ -349,6 +347,9 @@ mdl_vars_create_from_dataframe <- function(survey_idno, data_frame, file_id, fil
                            var_metadata = var_options_list)
 
 }
+
+
+
 
 
 
@@ -414,4 +415,37 @@ mdl_vars_create_from_dataframe <- function(survey_idno, data_frame, file_id, fil
 # isTRUE(all.equal(a_var, trunc(a_var)))
 #
 # all(test_dta$var_numeric == trunc(test_dta$var_numeric))
+
+
+
+
+
+#' Get a a variable
+#'
+#' Fetches the metadata for a variable
+#'
+#' @return API call response.
+#'
+#' @param survey_idno Survey unique identifier
+#' @param variable_id VAriable ID
+#'
+#' @export
+survey_get_variable <- function(survey_idno, variable_id){
+
+    url <- paste(mdl_api_get_url(), 'datasets', "variable", survey_idno, variable_id, sep = "/")
+
+    httpResponse <- httr::GET(url,
+                              httr::add_headers("X-API-KEY" = mdl_api_get_key())
+    )
+
+    response_content <- httr::content(httpResponse, "text")
+
+    if(httpResponse$status_code!=200){
+        warning(response_content)
+    }
+
+    output <- jsonlite::fromJSON(response_content)
+
+    return (output)
+}
 

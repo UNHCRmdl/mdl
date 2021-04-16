@@ -108,6 +108,9 @@ mdl_survey_generate_metadata_list <- function(
                 name = primary_investigators
                 #affiliation = c("", "")
             ),
+            distribution_statement = list(
+                contact = contacts_list
+            ),
             production_statement = list(
                 producers = data.frame(
                     name = other_producers
@@ -171,8 +174,8 @@ mdl_survey_generate_metadata_list <- function(
             ),
             data_access = list(
                 dataset_use = list(
-                    cit_req = a_survey_citation,
-                    contact = contacts_list
+                    cit_req = a_survey_citation
+                    #contact = contacts_list # would appear under ACCESS AUTHORITY
                     #   data.frame(
                     #   name = c("aaa", "bbb"),
                     #   affiliation = c("un", "un"),
@@ -331,6 +334,33 @@ survey_create <- function(
 
 
 
+#' Delete a survey given an idno
+#'
+#' Given an unique idno, deletes the survey
+#'
+#' @return API call response.
+#'
+#' @param survey_idno Survey unique identifier
+#'
+#' @export
+mdl_survey_delete <- function(survey_idno){
+
+    url <- paste(mdl_api_get_url(), 'datasets', survey_idno, sep = "/")
+
+    httpResponse <- httr::DELETE(url,
+                              httr::add_headers("X-API-KEY" = mdl_api_get_key())
+    )
+
+    response_content <- httr::content(httpResponse, "text")
+
+    if(httpResponse$status_code!=200){
+        warning(response_content)
+    }
+
+    output <- jsonlite::fromJSON(response_content)
+
+    return (output)
+}
 
 
 
@@ -353,6 +383,34 @@ mdl_survey_get <- function(survey_idno){
     httpResponse <- httr::GET(url,
                               httr::add_headers("X-API-KEY" = mdl_api_get_key())
                               )
+
+    response_content <- httr::content(httpResponse, "text")
+
+    if(httpResponse$status_code!=200){
+        warning(response_content)
+    }
+
+    output <- jsonlite::fromJSON(response_content)
+
+    return (output)
+}
+
+
+#' Get survey list
+#'
+#' Gets list of surveys with main info
+#'
+#' @return API call response.
+#'
+#' @export
+mdl_survey_get_list <- function(){
+
+    url <- paste(mdl_api_get_url(), 'datasets', sep = "/")
+
+    httpResponse <- httr::GET(url,
+                              httr::add_headers("X-API-KEY" = mdl_api_get_key())
+                              #,httr::accept_json()
+    )
 
     response_content <- httr::content(httpResponse, "text")
 
