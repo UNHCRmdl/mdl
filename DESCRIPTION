@@ -17,4 +17,5 @@ Imports:
     httr,
     jsonlite,
     labelled,
-    haven
+    haven,
+	tools

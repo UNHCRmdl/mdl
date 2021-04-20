@@ -19,7 +19,8 @@ mdl_enum_collection <- list(
     MENA = "MENA",
     WestAfrica = "WA",
     EastAfrica = "EHA",
-    SourthAfrica = "SAO"
+    SourthAfrica = "SAO",
+    WorldBank = "WBG"
 )
 
 # list of possible ways to publish the data files
@@ -178,6 +179,32 @@ mdl_enum_resource_type <- list(
     doc_technical = "doc/tec",
     doc_other = "doc/oth",
     microdata = "dat/micro"
+)
+
+# list of possible formats of resources
+#' @export
+mdl_enum_resource_format <- list(
+    Compressed_Generic = "application/x-compressed",
+    Compressed_ZIP = "application/zip",
+    Data_CSPro = "application/x-cspro",
+    Data_dBase = "application/dbase",
+    Data_Microsoft_Access = "application/msaccess",
+    Data_SAS = "application/x-sas",
+    Data_SPSS = "application/x-spss",
+    Data_Stata = "application/x-stata",
+    Document_Generic = "text",
+    Document_HTML = "text/html",
+    Document_Microsoft_Excel = "application/msexcel",
+    Document_Microsoft_PowerPoint = "application/mspowerpoint",
+    Document_Microsoft_Word = "application/msword",
+    Document_PDF = "application/pdf",
+    Document_Postscript = "application/postscript",
+    Document_Plain = "text/plain",
+    Document_WordPerfect = "text/wordperfect",
+    Image_GIF = "image/gif",
+    Image_JPEG = "image/jpeg",
+    Image_PNG = "image/png",
+    Image_TIFF = "image/tiff"
 )
 
 # list of country names given ISO code

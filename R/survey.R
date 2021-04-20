@@ -201,9 +201,75 @@ mdl_survey_generate_metadata_list <- function(
 }
 
 
-# create a survey from metadata
-# TODO: check data_remote_url: it is in NADAR but does not work
-#
+
+#' Create survey from DDI file
+#'
+#' Imports a DDI XML file and its metadata creating a new survey.
+#'
+#' @return API call response
+#'
+#' @param xml_file Path to the DDI XML file.
+#' @param rdf_file Path to the RDF file.
+#' @param enum_collection The ID of the collection where the survey will be created. To see an up to date list of collections call mdl_collection_list().You can also use the corresponding enumerator, e.g.: mdl_enum_collection$WestAfrica
+#' @param enum_survey_access_policy Specifies the access level to the data files. You can use the corresponding enumerator, e.g.: mdl_enum_survey_access_policy$'Licensed use files'
+#' @param data_remote_url Link to the data files, in case enum_survey_access_policy is set to remote (link to external repository).
+#' @param published The survey status: FALSE for draft, TRUE for published.
+#' @param overwrite Specifies if the survey will be overwritten in case it already exists: FALSE for not overwriting, TRUE for overwriting. If a survey with the same idno already exists and the argument is set to FALSE, the survey will not change and an error will be returned.
+#'
+#' @export
+mdl_survey_import_ddi <- function(xml_file, rdf_file = NULL, enum_collection, enum_survey_access_policy, data_remote_url = NULL, published = FALSE, overwrite = FALSE){
+
+    if(enum_survey_access_policy == mdl_enum_survey_access_policy$`Data available from external repository (link)` && is.null(data_remote_url)){
+        stop("enum_survey_access_policy is set to remote, but data_remote_url was not specified.")
+    }
+
+    # define parameters
+    opt_published <- as.numeric(published)
+    opt_overwrite <-  "no"
+    if(identical(overwrite, TRUE) || identical(overwrite, "yes")){
+        opt_overwrite <- "yes"
+    }
+
+    # define options
+    options = list(
+        file = httr::upload_file(xml_file),
+        overwrite = opt_overwrite,
+        published = opt_published,
+        repositoryid = enum_collection,
+        access_policy = enum_survey_access_policy,
+        data_remote_url = data_remote_url
+    )
+
+    if (!is.null(rdf_file) && file.exists(rdf_file)){
+        options$rdf = httr::upload_file(rdf_file)
+    }
+
+    # specify url
+    url <-  paste(mdl_api_get_url(), "datasets", "import_ddi", sep = "/")
+
+    # call API
+    httpResponse <- httr::POST(url,
+                               httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                               body = options
+                               #encode = "json"
+    )
+
+    response_content <- httr::content(httpResponse, "text")
+
+    output <- jsonlite::fromJSON(response_content)
+    if(!is.list(output)){
+        output <- list(output)
+    }
+
+    if(httpResponse$status_code!=200){
+        warning(response_content)
+    }
+
+    return (output)
+}
+
+
+
 #' Create survey from metadata list
 #'
 #' Creates or overwrites a survey in the MDL starting from a list containing the survey metadata. The survey created will not include the variables metadata, which should be created afterwards.
@@ -213,17 +279,22 @@ mdl_survey_generate_metadata_list <- function(
 #' @param survey_metadata_list A list containing the metadata. We recommend to create the list using the function mdl_survey_generate_metadata_list.
 #' @param enum_collection The ID of the collection where the survey will be created. To see an up to date list of collections call mdl_collection_list().You can also use the corresponding enumerator, e.g.: mdl_enum_collection$WestAfrica
 #' @param enum_survey_access_policy Specifies the access level to the data files. You can use the corresponding enumerator, e.g.: mdl_enum_survey_access_policy$'Licensed use files'
+#' @param data_remote_url Link to the data files in case enum_survey_access_policy is set to remote (link to external repository).
 #' @param published The survey status: FALSE for draft, TRUE for published.
 #' @param overwrite Specifies if the survey will be overwritten in case it already exists: FALSE for not overwriting, TRUE for overwriting. If a survey with the same idno already exists and the argument is set to FALSE, the survey will not change and an error will be returned.
 #'
 #' @export
-mdl_survey_create <- function(survey_metadata_list, enum_collection, enum_survey_access_policy, published = FALSE, overwrite = FALSE){
+mdl_survey_create <- function(survey_metadata_list, enum_collection, enum_survey_access_policy, data_remote_url = NULL, published = FALSE, overwrite = FALSE){
+
+    if(enum_survey_access_policy == mdl_enum_survey_access_policy$`Data available from external repository (link)` && is.null(data_remote_url)){
+        stop("enum_survey_access_policy is set to remote, but data_remote_url was not specified.")
+    }
 
     # define parameters
     a_metadata_idno = survey_metadata_list$study_desc$title_statement$idno # this is probably not needed but required in the documentation
     opt_published <- as.numeric(published)
     opt_overwrite <-  "no"
-    if(overwrite){
+    if(identical(overwrite, TRUE) || identical(overwrite, "yes")){
         opt_overwrite <- "yes"
     }
 
@@ -233,6 +304,7 @@ mdl_survey_create <- function(survey_metadata_list, enum_collection, enum_survey
                               metadata = survey_metadata_list,
                               repositoryid = enum_collection,
                               access_policy = enum_survey_access_policy,
+                              data_remote_url = data_remote_url,
                               published = opt_published,
                               overwrite = opt_overwrite
                               )
@@ -403,7 +475,7 @@ mdl_survey_get <- function(survey_idno){
 #' @return API call response.
 #'
 #' @export
-mdl_survey_get_list <- function(){
+mdl_survey_list <- function(){
 
     url <- paste(mdl_api_get_url(), 'datasets', sep = "/")
 
