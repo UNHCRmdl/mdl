@@ -435,8 +435,23 @@ mdl_survey_delete <- function(survey_idno){
 }
 
 
+#' Get link to survey
+#'
+#' Given an unique idno, it return the link to that survey. Please note that this will be redirected to another url format that uses an internal id instead of the idno.
+#'
+#' @return Url to dataset.
+#'
+#' @param survey_idno Survey unique identifier
+#'
+#' @export
+mdl_survey_url <- function(survey_idno){
 
+    api_url <- mdl_api_get_url()
+    home_url <- gsub( "/api", "", api_url)
+    dataset_url <- paste(home_url, "catalog", "study", survey_idno, sep = "/")
 
+    return(dataset_url)
+}
 
 
 #' Get a survey given an idno
@@ -495,5 +510,56 @@ mdl_survey_list <- function(){
     return (output)
 }
 
+mdl_survey_options <- function(
+    survey_idno,
+    enum_survey_access_policy = NULL,
+    data_remote_url = NULL,
+    published = NULL,
+    enum_collection = NULL,  #not sure it works
+    linked_collections = NULL, #not sure it works
+    tags = NULL, # does not work
+    aliases = NULL, # does not work
+    link_study = NULL,
+    link_indicator = NULL
+){
+    # published to be passed as 0 or 1
+    published <- as.numeric(published)
 
+    # specify call options
+    options <- list(
+        access_policy = enum_survey_access_policy,
+        data_remote_url = data_remote_url,
+        published = published,
+        tags = tags,
+        aliases = aliases,
+        owner_collection = enum_collection,
+        linked_collections = linked_collections,
+        link_study = link_study,
+        link_indicator = link_indicator
+    )
+
+    # specify url
+    url <-  paste(mdl_api_get_url(), "datasets", survey_idno, sep = "/")
+
+    # call API
+    httpResponse <- httr::PUT(url,
+                               httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                               body = options,
+                               encode = "json"
+    )
+
+    response_content <- httr::content(httpResponse, "text")
+
+    output <- jsonlite::fromJSON(response_content)
+    if(!is.list(output)){
+        output <- list(output)
+    }
+
+    if(httpResponse$status_code!=200){
+        warning(response_content)
+    }
+
+    return (output)
+
+}
 

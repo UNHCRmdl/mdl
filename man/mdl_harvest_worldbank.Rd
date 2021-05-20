@@ -8,6 +8,7 @@ mdl_harvest_worldbank(
   wbg_survey_idno,
   base_path = NULL,
   upload_files = TRUE,
+  idno_prefix = "WBG",
   overwrite,
   published
 )
@@ -19,10 +20,15 @@ mdl_harvest_worldbank(
 
 \item{upload_files}{TRUE if you want to upload a copy of the documentation files; FALSE if you want just to put a direct link to the files}
 
+\item{idno_prefix}{A string to be used as prefix of the idno, so that it can be easily recognized as harvested.}
+
 \item{overwrite}{TRUE if you want to overwrite the dataset in case it already exists; FALSE if you want to avoid to overwrite}
 
 \item{published}{TRUE if you want to publish directly the dataset; FALSE if you want just to load it in the back-end}
 }
 \description{
 Copies a dataset from the WBG microdata library (https://microdata.worldbank.org) to the UNHCR MDL.
+}
+\details{
+Warning messages about incomplete final line found in readLines is not a concern.
 }

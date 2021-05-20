@@ -144,8 +144,8 @@ a_response <- mdl_resource_upload_file_and_link(
     survey_idno = "UNHCR_ETH_2021_TEST_v2.1",
     file_path = "test_file.csv",
     enum_resource_type = mdl_enum_resource_type$microdata,
-    resource_title = "Household data",
-    resource_description = "Contains the household data collected during the survey"
+    title = "Household data",
+    description = "Contains the household data collected during the survey"
 )
 
 ```

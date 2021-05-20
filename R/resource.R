@@ -257,7 +257,6 @@ mdl_resource_upload_file_and_link <- function(survey_idno,
 #' @param resource_title Title of the resource as shown in the platform to the final user.
 #' @param resource_description Brief description of the resource as shown in the platform to the final user.
 #'
-#' @export
 mdl_resource_upload_file_and_link_old <- function(survey_idno, file_path, enum_resource_type, resource_title, resource_description = NULL){
 
     # upload file

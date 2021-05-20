@@ -4,15 +4,20 @@
 #'
 #' @param wbg_survey_idno Unique identifier in the World Bank microdata library
 #' @param base_path The path on your computer where the files will be downloaded
+#'
 #' @param upload_files TRUE if you want to upload a copy of the documentation files; FALSE if you want just to put a direct link to the files
+#' @param idno_prefix A string to be used as prefix of the idno, so that it can be easily recognized as harvested.
 #' @param overwrite TRUE if you want to overwrite the dataset in case it already exists; FALSE if you want to avoid to overwrite
 #' @param published TRUE if you want to publish directly the dataset; FALSE if you want just to load it in the back-end
+#'
+#' @details Warning messages about incomplete final line found in readLines is not a concern.
 #'
 #' @export
 mdl_harvest_worldbank <- function(
     wbg_survey_idno,
     base_path = NULL,
     upload_files = TRUE,
+    idno_prefix = "WBG",
     overwrite,
     published
 ){
@@ -49,16 +54,23 @@ mdl_harvest_worldbank <- function(
     file1 <- paste0(survey_path, "/", idno, ".xml")
     file2 <- paste0(survey_path, "/", idno, ".rdf")
     file3 <- paste0(survey_path, "/", idno, ".json")
-    utils::download.file(url = url1, destfile = file1, method = "curl")
-    utils::download.file(url = url2, destfile = file2, method = "curl")
-    utils::download.file(url = url3, destfile = file3, method = "curl")
+    if(! file.exists(file1)){
+        utils::download.file(url = url1, destfile = file1, method = "curl")
+    }
+    if(! file.exists(file2)){
+        utils::download.file(url = url2, destfile = file2, method = "curl")
+    }
+    if(! file.exists(file3)){
+        utils::download.file(url = url3, destfile = file3, method = "curl")
+    }
 
-
+print("ready to get info")
     # Extract the dataset access policy
     url <- paste0("https://microdata.worldbank.org/index.php/api/catalog/", idno, "?id_format=idno")
     httpResponse <- httr::GET(url)
-    output = jsonlite::fromJSON(content(httpResponse, "text"))
-
+    print("httpResponse") ###
+    output = jsonlite::fromJSON(httr::content(httpResponse, "text"))
+    print("output") ###
     # If remote access in WB Microdata Library, we link to the repository of origin.
     if(output$dataset$data_access_type == "remote") {
         remote_url = output$dataset$remote_data_url
@@ -66,6 +78,7 @@ mdl_harvest_worldbank <- function(
         # Otherwise, we link to the WB Microdata Library survey page.
         remote_url = paste0("https://microdata.worldbank.org/index.php/catalog/study/", idno)
     }
+    print("set remote link")###
 
 
     # check if should upload files or just link
@@ -74,6 +87,18 @@ mdl_harvest_worldbank <- function(
         rdf_file_path <- file2
     }
 
+    # if the idno does not start with the desired prefix, I will have to modify the XML file
+    if(! is.null(idno_prefix) && !is.na(idno_prefix)){
+        new_idno <- paste(idno_prefix, idno, sep = "_")
+        file_text  <- readLines(file1)
+        # modify id if necessary
+        if(! sum( grepl(pattern = new_idno, x = file_text, fixed = TRUE), na.rm = TRUE) > 0){
+            file_text  <- gsub(pattern = idno, replacement = new_idno, x = file_text)
+            writeLines(text = file_text, con = file1)
+        }
+        idno <- new_idno
+    }
+    print("set prefix")###
 
     # Create survey
     create_response <- mdl_survey_import_ddi(xml_file = file1,
@@ -84,12 +109,22 @@ mdl_harvest_worldbank <- function(
                                              published = published,
                                              overwrite = overwrite)
 
+    print("created response")###
+
+
     if(!identical(create_response$status, "success")){
-        stop("Error when trying to create: ", idno)
+        print(create_response)
+        message("Error when trying to create: ", idno)
     }
 
-    # add documentation pdf
-    generate_pdf_response <- mdl_survey_generate_pdf(idno)
+    # create variables list only is below a certain threshold
+    list_variables_in_pdf <- 0
+    if(!is.null(create_response$survey$varcount) && create_response$survey$varcount < 3000){
+        list_variables_in_pdf <- 1
+    }
+
+    #add documentation pdf
+    generate_pdf_response <- mdl_survey_generate_pdf(idno, variable_list = list_variables_in_pdf, variable_description = list_variables_in_pdf)
     # if error, create it without variables
     if(!identical(generate_pdf_response$status, "success")){
         message("Error generating PDF documentation probably due to too large number of variables. Trying to create the PDF without vars...")
@@ -203,6 +238,8 @@ mdl_harvest_worldbank <- function(
     }
 
     cat("\n\n")
+
+    return(create_response)
 
 }
 
