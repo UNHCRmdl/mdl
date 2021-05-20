@@ -35,7 +35,8 @@ mdl_survey_generate_pdf <- function(survey_idno,
             dctype = "doc/tec",
             title = resource_title,
             dcformat = "application/pdf",
-            description = NULL
+            description = NULL,
+            overwrite = "yes"
         )
     }else {
         return(survey_generate_pdf_response)

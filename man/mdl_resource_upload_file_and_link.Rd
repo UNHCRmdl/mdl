@@ -8,8 +8,19 @@ mdl_resource_upload_file_and_link(
   survey_idno,
   file_path,
   enum_resource_type,
-  resource_title,
-  resource_description = NULL
+  title,
+  description = NULL,
+  enum_resource_format = NULL,
+  author = NULL,
+  dcdate = NULL,
+  country = NULL,
+  language = NULL,
+  contributor = NULL,
+  publisher = NULL,
+  rights = NULL,
+  abstract = NULL,
+  toc = NULL,
+  overwrite = FALSE
 )
 }
 \arguments{
@@ -19,13 +30,36 @@ mdl_resource_upload_file_and_link(
 
 \item{enum_resource_type}{The type of resource. We recommend to use the corresponding enumerator, e.g.: mdl_enum_resource_type$doc_report}
 
-\item{resource_title}{Title of the resource as shown in the platform to the final user.}
+\item{title}{Title of the resource as shown in the platform to the final user.}
 
-\item{resource_description}{Brief description of the resource as shown in the platform to the final user.}
+\item{description}{Brief description of the resource as shown in the platform to the final user.}
+
+\item{enum_resource_format}{Resource file format. We recommend to use the corresponding enumerator, e.g.: mdl_enum_resource_format$Document_PDF}
+
+\item{author}{Author name}
+
+\item{dcdate}{Date using YYYY-MM-DD format}
+
+\item{country}{Country name}
+
+\item{language}{Language or Language code}
+
+\item{contributor}{Contributor name}
+
+\item{publisher}{Publisher name}
+
+\item{rights}{Rights}
+
+\item{abstract}{Resource abstract}
+
+\item{toc}{Table of contents}
+
+\item{overwrite}{Boolean, specifies if the file/resource should be overwritten if already present}
 }
 \value{
 API call response.
 }
 \description{
-This function first uploads a file for a given survey, than creates a resource and link it to the uploaded file.
+This function first uploads a file for a given survey, then creates a resource and link it to the uploaded file.
+The name of the file works as an identifier, meaning that uploading another file with the same name will overwrite the file and the resource.
 }
