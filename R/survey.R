@@ -30,6 +30,7 @@
 #' @param data_collectors Vector with the name of the actual data collectors, e.g.: c("National Bureau of Statistics", "Department of Immigration Services")
 #' @param questionnaire_description Description of the questionnaire sections. Use \\n to start a new line in the text.
 #' @param contacts_list A list with the contacts. Each contact is a list with the following objects: name, affiliation, email; e.g.: list(list(name = "Curation team", affiliation = "UNHCR", email = "microdata@unhcr.org"))
+#' @param publication_year Year of pubblication, used in the citation. If not provided, it will be taken from the collection_date_end.
 #'
 #' @export
 mdl_survey_generate_metadata_list <- function(
@@ -58,7 +59,8 @@ mdl_survey_generate_metadata_list <- function(
     data_collection_notes = "",
     data_collectors,
     questionnaire_description,
-    contacts_list = list(list(name = "Curation team", affiliation = "UNHCR", email = "microdata@unhcr.org"))
+    contacts_list = list(list(name = "Curation team", affiliation = "UNHCR", email = "microdata@unhcr.org")),
+    publication_year = NULL
 ){
 
     # create countries
@@ -77,9 +79,14 @@ mdl_survey_generate_metadata_list <- function(
     if(length(primary_investigators) > 1){
         investigators_string <- paste0(paste0(primary_investigators[1:length(primary_investigators)-1], ", "), primary_investigators[length(primary_investigators)], "")
     }
+    # publication year
+    if(is.null(publication_year) || as.numeric(publication_year) %in% c(NA)){
+        publication_year <- substring(collection_date_end, 1, 4)
+    }
     # citation string
-    a_survey_citation <- paste0(investigators_string, ": ", countries_string, " - ", title, ". ", "UNHCR microdata library, https://microdata.unhcr.org")
-
+    a_survey_citation <- paste0(investigators_string, " (", publication_year, "). ", countries_string, ": ", title, ". ", "Accessed from: https://microdata.unhcr.org")
+        # paste0(investigators_string, ": ", countries_string, " - ", title, ". ", "UNHCR microdata library, https://microdata.unhcr.org")
+        #UNHCR (2021). Kenya: Socio-economic assessment of refugees in Kakuma camp, 2015. Accessed from: https://microdata.unhcr.org.
 
     # create metadata list
     a_survey_metadata <- list(

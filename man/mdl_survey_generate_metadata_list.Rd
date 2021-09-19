@@ -31,7 +31,8 @@ mdl_survey_generate_metadata_list(
   data_collectors,
   questionnaire_description,
   contacts_list = list(list(name = "Curation team", affiliation = "UNHCR", email =
-    "microdata@unhcr.org"))
+    "microdata@unhcr.org")),
+  publication_year = NULL
 )
 }
 \arguments{
@@ -86,6 +87,8 @@ mdl_survey_generate_metadata_list(
 \item{questionnaire_description}{Description of the questionnaire sections. Use \\n to start a new line in the text.}
 
 \item{contacts_list}{A list with the contacts. Each contact is a list with the following objects: name, affiliation, email; e.g.: list(list(name = "Curation team", affiliation = "UNHCR", email = "microdata@unhcr.org"))}
+
+\item{publication_year}{Year of pubblication, used in the citation. If not provided, it will be taken from the collection_date_end.}
 }
 \value{
 A list containing the metadata to be passed to the mdl_survey_create function.
