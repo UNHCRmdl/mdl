@@ -1,23 +1,29 @@
-#' Harvest from World Bank
+#' Harvest from external NADA
 #'
-#' Copies a dataset from the WBG microdata library (https://microdata.worldbank.org) to the UNHCR MDL.
+#' Copies a dataset from another NADA microdata library to the UNHCR MDL.
+#' By default, harvests from the WBG library (https://microdata.worldbank.org). Changing the parameters, the harvest should work with other NADA based libraries (given other implementations and versions it may not work though).
 #'
+#' @return API call response.
+#'
+#' @param library_url The url of the library, for example: "https://microdata.worldbank.org"
 #' @param wbg_survey_idno Unique identifier in the World Bank microdata library
-#' @param base_path The path on your computer where the files will be downloaded
-#'
+#' @param base_path The path on your computer where the files will be downloaded, if not specified uses the current working directory
 #' @param upload_files TRUE if you want to upload a copy of the documentation files; FALSE if you want just to put a direct link to the files
 #' @param idno_prefix A string to be used as prefix of the idno, so that it can be easily recognized as harvested.
+#' @param enum_collection The collection where copy the dataset. Please consider using mdl_enum_collection.
 #' @param overwrite TRUE if you want to overwrite the dataset in case it already exists; FALSE if you want to avoid to overwrite
 #' @param published TRUE if you want to publish directly the dataset; FALSE if you want just to load it in the back-end
 #'
-#' @details Warning messages about incomplete final line found in readLines is not a concern.
+#' @details Warning messages about incomplete final line found in readLines is not a concern. Please note that files get downloaded only if not present in the base_path folder: to have up to date files delete them.
 #'
 #' @export
-mdl_harvest_worldbank <- function(
-    wbg_survey_idno,
+mdl_harvest_nada <- function(
+    library_url = "https://microdata.worldbank.org",
+    survey_idno,
     base_path = NULL,
     upload_files = TRUE,
     idno_prefix = "WBG",
+    enum_collection = mdl_enum_collection$WorldBank,
     overwrite,
     published
 ){
@@ -30,8 +36,8 @@ mdl_harvest_worldbank <- function(
     }
 
     # start message
-    print(paste("Processing", wbg_survey_idno))
-    idno <- wbg_survey_idno
+    print(paste("Processing", survey_idno))
+    idno <- survey_idno
 
     # Set folders
     survey_path <- file.path(base_path, idno)
@@ -46,14 +52,17 @@ mdl_harvest_worldbank <- function(
         dir.create(doc_path)
     }
 
+    # get the internal dataset id
+    dataset_id <- mdl::mdl_survey_internal_id(survey_idno)
 
     # Download the metadata files (ddi and rdf files + json version of rdf)
-    url1 <- paste0("https://microdata.worldbank.org/index.php/api/catalog/ddi/", idno)
-    url2 <- paste0("https://microdata.worldbank.org/index.php/api/catalog/rdf/", idno)
-    url3 <- paste0("https://microdata.worldbank.org/index.php/api/catalog/resources/", idno)
+    url1 <- paste0(library_url, "/index.php/api/catalog/ddi/", idno)  # alternatively this may work:  url1 <- paste0(library_url, "/index.php/metadata/export/", dataset_id, "/ddi")
+    url2 <- paste0(library_url, "/index.php/api/catalog/rdf/", idno)
+    url3 <- paste0(library_url, "/index.php/api/catalog/resources/", idno) # alternatively this may work:  url3 <- paste0(library_url, "/index.php/metadata/export/", dataset_id, "/json")
     file1 <- paste0(survey_path, "/", idno, ".xml")
     file2 <- paste0(survey_path, "/", idno, ".rdf")
     file3 <- paste0(survey_path, "/", idno, ".json")
+    print(url1)
     if(! file.exists(file1)){
         utils::download.file(url = url1, destfile = file1, method = "curl")
     }
@@ -64,9 +73,9 @@ mdl_harvest_worldbank <- function(
         utils::download.file(url = url3, destfile = file3, method = "curl")
     }
 
-print("ready to get info")
+    print("ready to get info")
     # Extract the dataset access policy
-    url <- paste0("https://microdata.worldbank.org/index.php/api/catalog/", idno, "?id_format=idno")
+    url <- paste0(library_url, "/index.php/api/catalog/", idno, "?id_format=idno")
     httpResponse <- httr::GET(url)
     print("httpResponse") ###
     output = jsonlite::fromJSON(httr::content(httpResponse, "text"))
@@ -76,7 +85,7 @@ print("ready to get info")
         remote_url = output$dataset$remote_data_url
     } else {
         # Otherwise, we link to the WB Microdata Library survey page.
-        remote_url = paste0("https://microdata.worldbank.org/index.php/catalog/study/", idno)
+        remote_url = paste0(library_url, "/index.php/catalog/study/", idno)
     }
     print("set remote link")###
 
@@ -98,12 +107,18 @@ print("ready to get info")
         }
         idno <- new_idno
     }
-    print("set prefix")###
+    print("prefix to idno was set")###
+
+    # remove some parts of XML that cause errors
+    bug_text <- 'isPrimary'
+    file_text  <- readLines(file1)
+    file_text  <- gsub(pattern = bug_text, replacement = "X", x = file_text)
+    writeLines(text = file_text, con = file1)
 
     # Create survey
     create_response <- mdl_survey_import_ddi(xml_file = file1,
                                              rdf_file = rdf_file_path,
-                                             enum_collection = mdl_enum_collection$WorldBank,
+                                             enum_collection = enum_collection,
                                              enum_survey_access_policy = mdl_enum_survey_access_policy$`Data available from external repository (link)`,
                                              data_remote_url = remote_url,
                                              published = published,
@@ -245,42 +260,3 @@ print("ready to get info")
 
 
 
-#JOR_2016_DR-BL_v01_M
-#JOR_2015_SRHCS_v01_M
-#ETH_2017_SPS_v01_M
-#"BIH_2011_MICS-RS_v01_M"
-
-# https://microdata.worldbank.org/index.php/api/catalog/ddi/JOR_2016_DR-BL_v01_M
-#
-# zzzH <- mdl_harvest_worldbank(
-#     wbg_survey_idno = "JOR_2016_DR-BL_v01_M",
-#     base_path = "C:\\Users\\SANSON\\OneDrive - UNHCR\\Documents\\harvest_WBG",
-#     upload_files = T,
-#     overwrite = T,
-#     published = T
-# )
-#
-# zzzH2 <- mdl_harvest_worldbank(
-#     wbg_survey_idno = "JOR_2015_SRHCS_v01_M",
-#     base_path = NULL,
-#     upload_files = F,
-#     overwrite = T,
-#     published = T
-# )
-#
-#
-# zzzH3 <- mdl_harvest_worldbank(
-#     wbg_survey_idno = "ETH_2017_SPS_v01_M",
-#     base_path = NULL,
-#     upload_files = T,
-#     overwrite = T,
-#     published = T
-# )
-#
-# zzzH4 <- mdl_harvest_worldbank(
-#     wbg_survey_idno = "BIH_2011_MICS-RS_v01_M",
-#     base_path = NULL,
-#     upload_files = T,
-#     overwrite = T,
-#     published = T
-# )

@@ -27,20 +27,23 @@ mdl_survey_generate_pdf <- function(survey_idno,
         language = "en"
     )
 
-    # if successful, link a resource
-    if(identical(survey_generate_pdf_response$status, "success")){
-        mdl_resource_add (
-            survey_idno = survey_idno,
-            filename = basename(survey_generate_pdf_response$output),
-            dctype = "doc/tec",
-            title = resource_title,
-            dcformat = "application/pdf",
             description = NULL,
-            overwrite = "yes"
-        )
-    }else {
-        return(survey_generate_pdf_response)
-    }
+    return(survey_generate_pdf_response)
+
+    # # if successful, link a resource
+    # if(identical(survey_generate_pdf_response$status, "success")){
+    #     mdl_resource_add (
+    #         survey_idno = survey_idno,
+    #         filename = basename(survey_generate_pdf_response$output),
+    #         dctype = "doc/tec",
+    #         title = resource_title,
+    #         dcformat = "application/pdf",
+    #         description = NULL,
+    #         overwrite = "yes"
+    #     )
+    # }else {
+    #
+    # }
 }
 
 # Create the documentation pdf from the survey metadata.

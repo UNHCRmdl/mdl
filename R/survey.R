@@ -442,9 +442,9 @@ mdl_survey_delete <- function(survey_idno){
 }
 
 
-#' Get link to survey
+#' Get url to survey
 #'
-#' Given an unique idno, it return the link to that survey. Please note that this will be redirected to another url format that uses an internal id instead of the idno.
+#' Given an unique idno, it returns the link to that survey. Please note that this will be redirected to another url format that uses an internal id instead of the idno.
 #'
 #' @return Url to dataset.
 #'
@@ -458,6 +458,24 @@ mdl_survey_url <- function(survey_idno){
     dataset_url <- paste(home_url, "catalog", "study", survey_idno, sep = "/")
 
     return(dataset_url)
+}
+
+
+#' Get survey internal ID
+#'
+#' Given an unique idno, it returns the internal id.
+#'
+#' @return Dataset internal ID.
+#'
+#' @param survey_idno Survey unique identifier
+#'
+#' @export
+mdl_survey_internal_id <- function(survey_idno){
+
+    dataset_url <- mdl::mdl_survey_url(survey_idno)
+    dataset_internal_id <- basename(httr::GET(dataset_url)$url)
+
+    return(dataset_internal_id)
 }
 
 

@@ -427,10 +427,10 @@ mdl_vars_create_from_dataframe <- function(survey_idno, data_frame, file_id, fil
 #' @return API call response.
 #'
 #' @param survey_idno Survey unique identifier
-#' @param variable_id VAriable ID
+#' @param variable_id Variable ID
 #'
 #' @export
-survey_get_variable <- function(survey_idno, variable_id){
+mdl_survey_get_variable <- function(survey_idno, variable_id){
 
     url <- paste(mdl_api_get_url(), 'datasets', "variable", survey_idno, variable_id, sep = "/")
 

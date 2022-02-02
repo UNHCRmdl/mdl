@@ -2,7 +2,7 @@
 % Please edit documentation in R/survey.R
 \name{mdl_survey_url}
 \alias{mdl_survey_url}
-\title{Get link to survey}
+\title{Get url to survey}
 \usage{
 mdl_survey_url(survey_idno)
 }
@@ -13,5 +13,5 @@ mdl_survey_url(survey_idno)
 Url to dataset.
 }
 \description{
-Given an unique idno, it return the link to that survey. Please note that this will be redirected to another url format that uses an internal id instead of the idno.
+Given an unique idno, it returns the link to that survey. Please note that this will be redirected to another url format that uses an internal id instead of the idno.
 }
