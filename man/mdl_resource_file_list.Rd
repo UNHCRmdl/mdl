@@ -2,16 +2,23 @@
 % Please edit documentation in R/resource.R
 \name{mdl_resource_file_list}
 \alias{mdl_resource_file_list}
-\title{Get list of resources}
+\title{Delete a file}
 \usage{
 mdl_resource_file_list(survey_idno)
 }
 \arguments{
 \item{survey_idno}{The unique identifier of an existing survey, e.g.: UNHCR_ETH_2020_SENS_v2.1}
+
+\item{resource_id}{File ID. Use mdl_resource_file_list() to see the IDs
+Get list of files
+
+Given a survey identifier, provides list of files}
 }
 \value{
 API call response.
+
+API call response.
 }
 \description{
-Given a survey identifier, provides list of resources
+Deletes a file from a survey.
 }

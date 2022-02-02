@@ -110,9 +110,9 @@ mdl_harvest_nada <- function(
     print("prefix to idno was set")###
 
     # remove some parts of XML that cause errors
-    bug_text <- 'isPrimary'
+    bug_text <- 'frameUnit isPrimary'
     file_text  <- readLines(file1)
-    file_text  <- gsub(pattern = bug_text, replacement = "X", x = file_text)
+    file_text  <- gsub(pattern = bug_text, replacement = "frameUnit XXXXX", x = file_text)
     writeLines(text = file_text, con = file1)
 
     # Create survey

@@ -88,7 +88,7 @@ mdl_survey_generate_metadata_list(
 
 \item{contacts_list}{A list with the contacts. Each contact is a list with the following objects: name, affiliation, email; e.g.: list(list(name = "Curation team", affiliation = "UNHCR", email = "microdata@unhcr.org"))}
 
-\item{publication_year}{Year of pubblication, used in the citation. If not provided, it will be taken from the collection_date_end.}
+\item{publication_year}{Year of publication (used to generate the citation), used in the citation. If not provided, it will be taken from the collection_date_end.}
 }
 \value{
 A list containing the metadata to be passed to the mdl_survey_create function.

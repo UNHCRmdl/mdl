@@ -27,7 +27,6 @@ mdl_survey_generate_pdf <- function(survey_idno,
         language = "en"
     )
 
-            description = NULL,
     return(survey_generate_pdf_response)
 
     # # if successful, link a resource

@@ -30,7 +30,7 @@
 #' @param data_collectors Vector with the name of the actual data collectors, e.g.: c("National Bureau of Statistics", "Department of Immigration Services")
 #' @param questionnaire_description Description of the questionnaire sections. Use \\n to start a new line in the text.
 #' @param contacts_list A list with the contacts. Each contact is a list with the following objects: name, affiliation, email; e.g.: list(list(name = "Curation team", affiliation = "UNHCR", email = "microdata@unhcr.org"))
-#' @param publication_year Year of pubblication, used in the citation. If not provided, it will be taken from the collection_date_end.
+#' @param publication_year Year of publication (used to generate the citation), used in the citation. If not provided, it will be taken from the collection_date_end.
 #'
 #' @export
 mdl_survey_generate_metadata_list <- function(
@@ -208,6 +208,30 @@ mdl_survey_generate_metadata_list <- function(
 }
 
 
+#' Download survey DDI file
+#'
+#' Downloads a DDI XML file.
+#'
+#' @return File path
+#'
+#' @param survey_idno Path to the DDI XML file.
+#' @param path Path to where you want to save the file, if not specified uses current working directory.
+#'
+#' @export
+mdl_survey_download_ddi <- function(survey_idno, path = NULL){
+    idno_url <- paste(mdl_api_get_url(), "catalog", "ddi", survey_idno, sep = "/")
+    idno_file <- paste(survey_idno, "xml", sep = ".")
+    if(! is.null(path)){
+        idno_file <- file.path(path, idno_file)
+    }
+
+    utils::download.file(url = idno_url, destfile = idno_file, method = "curl")
+
+    return(idno_file)
+}
+
+
+
 
 #' Create survey from DDI file
 #'
@@ -226,7 +250,7 @@ mdl_survey_generate_metadata_list <- function(
 #' @export
 mdl_survey_import_ddi <- function(xml_file, rdf_file = NULL, enum_collection, enum_survey_access_policy, data_remote_url = NULL, published = FALSE, overwrite = FALSE){
 
-    if(enum_survey_access_policy == mdl_enum_survey_access_policy$`Data available from external repository (link)` && is.null(data_remote_url)){
+    if(!is.null(enum_survey_access_policy) && enum_survey_access_policy == mdl_enum_survey_access_policy$`Data available from external repository (link)` && is.null(data_remote_url)){
         stop("enum_survey_access_policy is set to remote, but data_remote_url was not specified.")
     }
 
@@ -236,6 +260,14 @@ mdl_survey_import_ddi <- function(xml_file, rdf_file = NULL, enum_collection, en
     if(identical(overwrite, TRUE) || identical(overwrite, "yes")){
         opt_overwrite <- "yes"
     }
+
+
+    # remove some parts of XML that cause errors
+    bug_text <- 'frameUnit isPrimary'
+    file_text  <- readLines(xml_file)
+    file_text  <- gsub(pattern = bug_text, replacement = "frameUnit XXXXX", x = file_text)
+    writeLines(text = file_text, con = xml_file)
+
 
     # define options
     options = list(
