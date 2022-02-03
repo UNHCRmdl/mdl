@@ -97,10 +97,10 @@ Secondly, pass the metadata list to the mdl_survey_create function to create a s
 # create the survey passing the metadata list
 a_response <- mdl_survey_create(
     survey_metadata_list = a_survey_metadata,
-    enum_collection = mdl_enum_collection$MENA,
+    enum_collection = mdl_enum_collection$EastAfrica,
     enum_survey_access_policy = mdl_enum_survey_access_policy$`Licensed use files`,
     published = FALSE,
-    overwrite = TRUE
+    overwrite = FALSE
 )
 ```
 Please note that this will only create the survey metadata. The variables metadata and the resources will be created in the following steps.
