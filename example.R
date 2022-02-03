@@ -110,3 +110,27 @@ a_response <- mdl_resource_upload_file_and_link(
 )
 
 
+
+#### workaround to make the PDF generation work (but it does not includes the variables)
+
+#test_id <- "UNHCR_ETH_2021_TEST_v2.1"
+
+# # download the ddi file
+# ddi_file <- mdl_survey_download_ddi(test_id)
+#
+# # upload the ddi
+# a_response <- mdl_survey_import_ddi(
+#     xml_file = ddi_file,
+#     rdf_file = NULL,
+#     enum_collection = NULL,
+#     enum_survey_access_policy = NULL,
+#     data_remote_url = NULL,
+#     published = NULL,
+#     overwrite = TRUE
+# )
+#
+#
+# # generate pdf
+# a_response <- mdl_survey_generate_pdf(survey_idno = test_id)
+
+

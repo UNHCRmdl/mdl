@@ -6,16 +6,15 @@
 #' @return API call response.
 #'
 #' @param survey_idno The identifier of the survey for which you want to generate the PDF, e.g.: UNHCR_ETH_2020_SENS_v2.1
-#' @param resource_title The title of the resource linked to the file. Default is "Documentation".
 #' @param variable_list Specifies if the PDF should include the variable list: 1 for yes, 0 for no.
 #' @param variable_description Specifies if the PDF should include the variable description: 1 for yes, 0 for no.
 #' @param external_resource Specifies if the PDF should include the external resources: 1 for yes, 0 for no.
 #'
 #' @export
 mdl_survey_generate_pdf <- function(survey_idno,
-                                    resource_title = "Documentation",
-                                    variable_list = 1,
-                                    variable_description = 1,
+                                    #resource_title = "Documentation",
+                                    variable_list = 0,
+                                    variable_description = 0,
                                     external_resource = 0)
 {
     # generate pdf
@@ -85,8 +84,3 @@ survey_generate_pdf <- function(
 
     return (output)
 }
-
-## test
-# survey_generate_pdf("TEST_DATASET", 1, 1, 1)
-# #$response$output  "ddi-documentation-english-303.pdf"
-# mdl_survey_generate_pdf("TEST_DATASET")
