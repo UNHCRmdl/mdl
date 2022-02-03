@@ -6,16 +6,13 @@
 \usage{
 mdl_survey_generate_pdf(
   survey_idno,
-  resource_title = "Documentation",
-  variable_list = 1,
-  variable_description = 1,
+  variable_list = 0,
+  variable_description = 0,
   external_resource = 0
 )
 }
 \arguments{
 \item{survey_idno}{The identifier of the survey for which you want to generate the PDF, e.g.: UNHCR_ETH_2020_SENS_v2.1}
-
-\item{resource_title}{The title of the resource linked to the file. Default is "Documentation".}
 
 \item{variable_list}{Specifies if the PDF should include the variable list: 1 for yes, 0 for no.}
 
