@@ -86,7 +86,8 @@ a_survey_metadata <-  mdl_survey_generate_metadata_list(
     data_collectors = c("Collector 1", "Collector2"),
     questionnaire_description = "Questionaire contained the following sections: ... ",
     contacts_list = list(list(name = "Curation team", affiliation = "UNHCR", email = "xxx@xxx.org"),
-                         list(name = "Another team", affiliation = "UNHCR", email = "xxx2@xxx.org"))
+                         list(name = "Another team", affiliation = "UNHCR", email = "xxx2@xxx.org")),
+    publication_year = 2021
 )
 ```
 
@@ -96,10 +97,10 @@ Secondly, pass the metadata list to the mdl_survey_create function to create a s
 # create the survey passing the metadata list
 a_response <- mdl_survey_create(
     survey_metadata_list = a_survey_metadata,
-    enum_collection = mdl_enum_collection$EastAfrica,
+    enum_collection = mdl_enum_collection$MENA,
     enum_survey_access_policy = mdl_enum_survey_access_policy$`Licensed use files`,
     published = FALSE,
-    overwrite = FALSE
+    overwrite = TRUE
 )
 ```
 Please note that this will only create the survey metadata. The variables metadata and the resources will be created in the following steps.
@@ -147,7 +148,6 @@ a_response <- mdl_resource_upload_file_and_link(
     title = "Household data",
     description = "Contains the household data collected during the survey"
 )
-
 ```
 
 
