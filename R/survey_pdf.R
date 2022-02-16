@@ -1,7 +1,7 @@
 # TODO: true and false nstead of 1 and 0
 #' Create documentation PDF
 #'
-#' This function creates the documentation PDF from the survey metadata and links a resource to it.
+#' This function creates the documentation PDF from the survey metadata.
 #'
 #' @return API call response.
 #'

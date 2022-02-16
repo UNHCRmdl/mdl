@@ -19,7 +19,7 @@ mdl_enum_collection <- list(
     MENA = "MENA",
     WestAfrica = "WA",
     EastAfrica = "EHA",
-    SourthAfrica = "SAO",
+    SouthernAfrica = "SAO",
     WorldBank = "WBG"
 )
 

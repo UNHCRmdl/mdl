@@ -24,5 +24,5 @@ mdl_survey_generate_pdf(
 API call response.
 }
 \description{
-This function creates the documentation PDF from the survey metadata and links a resource to it.
+This function creates the documentation PDF from the survey metadata.
 }
