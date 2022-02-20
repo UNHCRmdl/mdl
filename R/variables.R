@@ -203,6 +203,14 @@ mdl_vars_create_from_dataframe <- function(survey_idno, data_frame, file_id, fil
         ##### FACTOR
         if(a_var_class %in% c("haven_labelled", "factor")){
 
+            # Only difference between "haven_labelled" and "factor" is the value shown: if from haven we got to the actual value
+            cat_values <- c()
+            if(a_var_class == "haven_labelled"){
+                cat_values <- as.character(labelled::val_labels(a_var))
+            }else{
+                cat_values <- as.character(1:nlevels(a_var))
+            }
+
             # convert in case is from haven
             a_var <- haven::as_factor(a_var)
 
@@ -217,7 +225,6 @@ mdl_vars_create_from_dataframe <- function(survey_idno, data_frame, file_id, fil
 
             # define first part of categories
             cat_table <- table(a_var)
-            cat_values <- as.character(1 : nlevels(a_var))
             cat_labels <- names(cat_table)
             cat_is_missing <- rep("", nlevels(a_var))
             if(n_missing_values > 0) {
