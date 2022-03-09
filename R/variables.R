@@ -226,12 +226,23 @@ mdl_vars_create_from_dataframe <- function(survey_idno, data_frame, file_id, fil
             # define first part of categories
             cat_table <- table(a_var)
             cat_labels <- names(cat_table)
+            # should be the same length, if not probably there was a lacking labeling in stata for a var
+            if(length(cat_labels) != length(cat_values)){
+                print(paste(("There was an issue with a variable values. Probably the value labelling in stata was not complete, not all values were labelled. Check variable: "), names(data_frame)[i]))
+                print(cat_values)
+                print(cat_labels)
+                cat("/n/n")
+                # do not show values
+                cat_values <- rep("", length(cat_labels))
+                }
+            # add NAs if present
             cat_is_missing <- rep("", nlevels(a_var))
             if(n_missing_values > 0) {
                 cat_values <- c(cat_values, "Missing value")
                 cat_labels <- c(cat_labels, NA)
                 cat_is_missing <- c(cat_is_missing, "Y")
             }
+
 
             # get frequency stats
             cat_freq <- as.vector(cat_table)
@@ -240,6 +251,14 @@ mdl_vars_create_from_dataframe <- function(survey_idno, data_frame, file_id, fil
             for(a_freq in cat_freq){
                 cat_stats <- c(cat_stats, list(data.frame(value = a_freq, type = "freq", wgtd = 0)))
             }
+
+            # cat("\n")
+            # print(names(data_frame)[i])
+            # #print(a_var)
+            # print(cat_values)
+            # print(cat_labels)
+            # print(cat_is_missing)
+            # cat("\n\n")
 
             # create options list
             a_var_options$var_catgry <-
