@@ -52,7 +52,7 @@ mdl_survey_generate_metadata_list <- function(
     primary_investigators, # c()
     other_producers = c(""),
     sampling_description,
-    weighting_description,
+    weighting_description = "",
     collection_date_start,
     collection_date_end,
     enum_survey_collection_mode,
@@ -75,10 +75,7 @@ mdl_survey_generate_metadata_list <- function(
         countries_string <- paste0(paste0(country_names[1:length(country_names)-1], ", "), country_names[length(country_names)], "")
     }
     # organizations
-    investigators_string <- paste0(primary_investigators[1], "")
-    if(length(primary_investigators) > 1){
-        investigators_string <- paste0(paste0(primary_investigators[1:length(primary_investigators)-1], ", "), primary_investigators[length(primary_investigators)], "")
-    }
+    investigators_string <- stringr::str_c(primary_investigators, collapse = ", ")
     # publication year
     if(is.null(publication_year) || as.numeric(publication_year) %in% c(NA)){
         publication_year <- substring(collection_date_end, 1, 4)

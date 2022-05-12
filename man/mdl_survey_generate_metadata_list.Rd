@@ -23,7 +23,7 @@ mdl_survey_generate_metadata_list(
   primary_investigators,
   other_producers = c(""),
   sampling_description,
-  weighting_description,
+  weighting_description = "",
   collection_date_start,
   collection_date_end,
   enum_survey_collection_mode,
