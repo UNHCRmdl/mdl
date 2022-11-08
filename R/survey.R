@@ -70,10 +70,8 @@ mdl_survey_generate_metadata_list <- function(
 
     # create citation
     # countries
-    countries_string <- paste0(country_names[1], "")
-    if(length(country_names) > 1){
-        countries_string <- paste0(paste0(country_names[1:length(country_names)-1], ", "), country_names[length(country_names)], "")
-    }
+    countries_string <- stringr::str_c(country_names, collapse = ", ")
+
     # organizations
     investigators_string <- stringr::str_c(primary_investigators, collapse = ", ")
     # publication year

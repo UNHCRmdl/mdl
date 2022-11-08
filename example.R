@@ -41,6 +41,9 @@ collection_list <- mdl_collection_list()
 ###########
 
 
+# install the mdl package
+#devtools::install_github("UNHCRmdl/mdl")
+
 # create the metadata for a new survey
 a_survey_metadata <-  mdl_survey_generate_metadata_list(
     survey_idno = "UNHCR_ETH_2021_TEST_v2.1",
