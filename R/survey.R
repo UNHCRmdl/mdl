@@ -313,7 +313,7 @@ mdl_survey_import_ddi <- function(xml_file, rdf_file = NULL, enum_collection, en
 #' @param survey_metadata_list A list containing the metadata. We recommend to create the list using the function mdl_survey_generate_metadata_list.
 #' @param enum_collection The ID of the collection where the survey will be created. To see an up to date list of collections call mdl_collection_list().You can also use the corresponding enumerator, e.g.: mdl_enum_collection$WestAfrica
 #' @param enum_survey_access_policy Specifies the access level to the data files. You can use the corresponding enumerator, e.g.: mdl_enum_survey_access_policy$'Licensed use files'
-#' @param data_remote_url Link to the data files in case enum_survey_access_policy is set to remote (link to external repository).
+#' @param data_remote_url Link to the data files in case enum_survey_access_policy is set to remote (link to external repository). Use the whole address (including https://) to make it work.
 #' @param published The survey status: FALSE for draft, TRUE for published.
 #' @param overwrite Specifies if the survey will be overwritten in case it already exists: FALSE for not overwriting, TRUE for overwriting. If a survey with the same idno already exists and the argument is set to FALSE, the survey will not change and an error will be returned.
 #'
@@ -369,6 +369,8 @@ survey_create <- function(
         "published"=published,
         "overwrite"=overwrite
     )
+
+    print("used data_class_code and id and title")
 
     options <- c(options,metadata)
 

@@ -80,7 +80,8 @@ a_survey_metadata <-  mdl_survey_generate_metadata_list(
 a_response <- mdl_survey_create(
     survey_metadata_list = a_survey_metadata,
     enum_collection = mdl_enum_collection$MENA,
-    enum_survey_access_policy = mdl_enum_survey_access_policy$`Licensed use files`,
+    enum_survey_access_policy = mdl_enum_survey_access_policy$`Data available from external repository (link)`,
+    data_remote_url = "https://www.google.it",
     published = FALSE,
     overwrite = TRUE
 )

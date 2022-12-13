@@ -13,8 +13,8 @@
 #' @export
 mdl_survey_generate_pdf <- function(survey_idno,
                                     #resource_title = "Documentation",
-                                    variable_list = 0,
-                                    variable_description = 0,
+                                    variable_list = 1,
+                                    variable_description = 1,
                                     external_resource = 0)
 {
     # generate pdf

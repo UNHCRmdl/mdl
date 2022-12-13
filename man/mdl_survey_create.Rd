@@ -20,7 +20,7 @@ mdl_survey_create(
 
 \item{enum_survey_access_policy}{Specifies the access level to the data files. You can use the corresponding enumerator, e.g.: mdl_enum_survey_access_policy$'Licensed use files'}
 
-\item{data_remote_url}{Link to the data files in case enum_survey_access_policy is set to remote (link to external repository).}
+\item{data_remote_url}{Link to the data files in case enum_survey_access_policy is set to remote (link to external repository). Use the whole address (including https://) to make it work.}
 
 \item{published}{The survey status: FALSE for draft, TRUE for published.}
 

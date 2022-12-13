@@ -1,3 +1,69 @@
+# Get list of data files metadata in a survey.
+survey_get_data_file_list <- function(
+    survey_idno
+){
+
+    # specify url
+    url <-  paste(mdl_api_get_url(), "datasets", "datafiles", survey_idno, "data_files", sep = "/")
+
+    # call API
+    httpResponse <- httr::GET(url,
+                                 httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                                 #body = options,
+                                 encode = "json"
+    )
+
+    response_content <- httr::content(httpResponse, "text")
+
+    output <- jsonlite::fromJSON(response_content)
+    if(!is.list(output)){
+        output <- list(output)
+    }
+
+    if(httpResponse$status_code!=200){
+        warning(response_content)
+    }
+
+    return (output)
+}
+
+# Delete a data file metadata in a survey.
+survey_delete_data_file <- function(
+    survey_idno,
+    file_id
+){
+    # # before deleting you may check that it exists
+    # data_files_list <- survey_get_data_file_list(survey_idno)
+    # if(! file_id %in% names(files_list$data_files_list)){
+    #     return()
+    # }
+
+    # specify url
+    url <-  paste(mdl_api_get_url(), "datasets", "datafiles", survey_idno, file_id, sep = "/")
+
+    # call API
+    httpResponse <- httr::DELETE(url,
+                                 httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                                 #body = options,
+                                 encode = "json"
+    )
+
+    # I commented the code to avoid possible errors coming up if the file did not exist
+    # response_content <- httr::content(httpResponse, "text")
+    #
+    # output <- jsonlite::fromJSON(response_content)
+    # if(!is.list(output)){
+    #     output <- list(output)
+    # }
+    #
+    # if(httpResponse$status_code!=200){
+    #     warning(response_content)
+    # }
+    #
+    # return (output)
+}
+
+
 # Create a data file metadata in a survey. Once a file is create, you add variables metadata to it.
 survey_create_data_file <- function(
     survey_idno,
@@ -12,6 +78,8 @@ survey_create_data_file <- function(
     version = NULL,
     notes = NULL
 ){
+    # delete, just in case, the data file metadata so that each time this function is called it can create a new data file and overwrite the previouse one
+    delete_response <- survey_delete_data_file(survey_idno, file_id)
 
     # specify call options
     options = list(
@@ -52,7 +120,7 @@ survey_create_data_file <- function(
 }
 
 ### test
-# survey_create_data_file_response <- survey_create_data_file(survey_idno = test_survey_idno,
+# survey_create_data_file_response <- survey_create_data_file(survey_idno = "UNHCR_ETH_2021_TEST_v2.1",
 #                                                             file_id = "file_test_3",
 #                                                             file_name = "file name 3",
 #                                                             description = "file descr",
@@ -65,15 +133,16 @@ survey_create_data_file <- function(
 # Create a variable from a list of metadata. Can create more than one variable at once passing a list of metadata
 survey_create_variable <- function(
     survey_idno,
-    file_id,
+    #file_id,
     var_metadata
 ){
 
     # specify call options
     options <- var_metadata
 
+
     # specify url
-    url <-  paste(mdl_api_get_url(), "datasets", "variables", survey_idno, file_id, sep = "/")
+    url <-  paste(mdl_api_get_url(), "datasets", "variables", survey_idno, sep = "/")
 
     # call API
     httpResponse <- httr::POST(url,
@@ -96,23 +165,30 @@ survey_create_variable <- function(
     return (output)
 }
 
-###TEST
+# ###TEST
 # variable_create_options1 <- list(
 #     vid = "V1",
 #     name = "var_name1",
-#     labl = "var label1"
+#     labl = "var label1",
+#     file_id = "file_test_3"
 # )
 #
 # variable_create_options2 <- list(
 #     vid = "asdasd_dsadas",
 #     name = "var_name 5",
-#     labl = NULL #"var label 2"
+#     labl = "var label 2",
+#     file_id = "file_test_3"
 # )
-# variable_create_options_list <- list(variable_create_options1, variable_create_options2 )
+# variable_create_options3 <- list(
+#     vid = "v3",
+#     name = "var_name 3",
+#     labl = "var label 3"
+# )
+# variable_create_options_list <- list(variable_create_options1, variable_create_options2, variable_create_options3 )
 #
-# survey_create_variable_response <- survey_create_variable(    survey_idno = test_survey_idno,
-#                                                               file_id = "file_test_1",
-#                                                               var_metadata = variable_create_options2)
+# survey_create_variable_response <- survey_create_variable(    survey_idno = "UNHCR_ETH_2021_TEST_v2.1",
+#                                                               #file_id = "file_test_3",
+#                                                               var_metadata = variable_create_options_list)
 
 
 #########
@@ -189,7 +265,8 @@ mdl_vars_create_from_dataframe <- function(survey_idno, data_frame, file_id, fil
         a_var_options <- list(
             vid = a_var_id,
             name = a_var_name,
-            labl = a_var_label
+            labl = a_var_label,
+            file_id = file_id
         )
 
         ##### CHARACTER
@@ -227,20 +304,22 @@ mdl_vars_create_from_dataframe <- function(survey_idno, data_frame, file_id, fil
             cat_table <- table(a_var)
             cat_labels <- names(cat_table)
             # should be the same length, if not probably there was a lacking labeling in stata for a var
-            if(length(cat_labels) != length(cat_values)){
-                print(paste(("There was an issue with a variable values. Probably the value labelling in stata was not complete, not all values were labelled. Check variable: "), names(data_frame)[i]))
-                print(cat_values)
-                print(cat_labels)
-                cat("/n/n")
+            if( length(cat_labels) != length(cat_values)) {
+                if( n_missing_values != length(a_var) ){
+                    print(paste(("There was an issue with a variable values. Probably the value labelling in stata was not complete, not all values were labelled. Check variable: "), names(data_frame)[i]))
+                    print(cat_values)
+                    print(cat_labels)
+                    cat("/n/n")
+                }
                 # do not show values
                 cat_values <- rep("", length(cat_labels))
                 }
             # add NAs if present
-            cat_is_missing <- rep("", nlevels(a_var))
+            cat_is_missing <- rep(NA, nlevels(a_var))
             if(n_missing_values > 0) {
                 cat_values <- c(cat_values, "Missing value")
                 cat_labels <- c(cat_labels, NA)
-                cat_is_missing <- c(cat_is_missing, "Y")
+                cat_is_missing <- c(cat_is_missing, NA)#"Y")
             }
 
 
@@ -285,11 +364,11 @@ mdl_vars_create_from_dataframe <- function(survey_idno, data_frame, file_id, fil
                 cat_table <- table(a_var)
                 cat_values <- names(cat_table)
                 cat_labels <- rep(NA, length(cat_values))
-                cat_is_missing <- rep("", length(cat_values))
+                cat_is_missing <- rep(NA, length(cat_values))
                 if(n_missing_values > 0) {
                     cat_values <- c(cat_values, "Missing value")
                     cat_labels <- c(cat_labels, NA)
-                    cat_is_missing <- c(cat_is_missing, "Y")
+                    cat_is_missing <- c(cat_is_missing, NA)#"Y")
                 }
 
                 # get frequency stats
@@ -344,7 +423,7 @@ mdl_vars_create_from_dataframe <- function(survey_idno, data_frame, file_id, fil
             cat_table <- table(a_var)
             cat_values <- c("0", "1")
             cat_labels <- c("FALSE", "TRUE")
-            cat_is_missing <- rep("", 2)
+            cat_is_missing <- rep(NA, 2)
 
             # get frequency stats
             cat_stats <- list()
@@ -353,7 +432,7 @@ mdl_vars_create_from_dataframe <- function(survey_idno, data_frame, file_id, fil
             if(n_missing_values > 0) {
                 cat_values <- c(cat_values, "Missing value")
                 cat_labels <- c(cat_labels, NA)
-                cat_is_missing <- c(cat_is_missing, "Y")
+                cat_is_missing <- c(cat_is_missing, NA)#"Y")
                 cat_stats <- c(cat_stats, list(data.frame(value = n_missing_values, type = "freq", wgtd = 0)))
             }
 
@@ -369,14 +448,24 @@ mdl_vars_create_from_dataframe <- function(survey_idno, data_frame, file_id, fil
 
     # create all vars
     survey_create_variable(survey_idno = survey_idno,
-                           file_id = file_id,
+                           #file_id = file_id,
                            var_metadata = var_options_list)
 
 }
 
 
+### test
 
-
+# test_data <- read.csv("test_file_variables_types.csv")
+# test_data$factor_var <- as.factor(test_data$factor_var)
+#
+# vars_response <- mdl_vars_create_from_dataframe(survey_idno = "UNHCR_ETH_2021_TEST_v2.1",
+#                                       data_frame = test_data,
+#                                       file_id = "hh3",
+#                                       file_name = "hh3",
+#                                       file_description = "This file contains...")
+#
+# table(test_data$logical, useNA = "a")
 
 
 ###test
