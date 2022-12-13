@@ -1,6 +1,6 @@
 Package: mdl
 Title: R client for UNHCR Microdata Library
-Version: 1.0
+Version: 5.2
 Authors@R: 
     person(given = "Federico",
            family = "Sanson",

@@ -4,7 +4,12 @@
 \alias{mdl_survey_list}
 \title{Get survey list}
 \usage{
-mdl_survey_list()
+mdl_survey_list(limit = 50, offset = 0)
+}
+\arguments{
+\item{limit}{Max number of datasets to get. Default is 50.}
+
+\item{offset}{Point from which the query will start, to be used if you want to used paging. Default is 0.}
 }
 \value{
 API call response.

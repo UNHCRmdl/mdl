@@ -47,7 +47,7 @@ collection_list <- mdl_collection_list()
 # create the metadata for a new survey
 a_survey_metadata <-  mdl_survey_generate_metadata_list(
     survey_idno = "UNHCR_ETH_2021_TEST_v2.1",
-    title = "A Test Survey, 2021",
+    title = "A Test Survey, 2025",
     country_ISO_alpha3_codes = c("ETH"),
     enum_survey_study_type = mdl_enum_survey_study_type$`Sample Frame, Households [sf/hh]`,
     series_information = "A series test...",
@@ -55,7 +55,7 @@ a_survey_metadata <-  mdl_survey_generate_metadata_list(
     enum_survey_kind_of_data = mdl_enum_survey_kind_of_data$`Sample survey data [ssd]`,
     unit_of_analysis = "Household",
     version_description = "v2.1: Edited, cleaned and anonymised data.",
-    version_date = "2021-07-04",
+    version_date = "2025-07-04",
     scope_description = "The scope includes: \n- household characteristics \n- dwellings",
     enum_survey_topics = c(mdl_enum_survey_topics$Health, mdl_enum_survey_topics$Protection),
     keywords = c("Keyword 1", "Keyword 2", "Keyword 3"),
@@ -65,23 +65,22 @@ a_survey_metadata <-  mdl_survey_generate_metadata_list(
     other_producers = c("Another organisation"),
     sampling_description = "Simple sampling was applied...",
     weighting_description = "Weight was calculated in the following manner...",
-    collection_date_start = "2020-12-12",
-    collection_date_end = "2021-01-01",
+    collection_date_start = "2025-12-12",
+    collection_date_end = "2025-01-01",
     enum_survey_collection_mode = mdl_enum_survey_collection_mode$`Face-to-face [f2f]`,
     data_collection_notes = "Enumerators took a 3-day course...",
     data_collectors = c("Collector 1", "Collector2"),
     questionnaire_description = "Questionaire contained the following sections: ... ",
     contacts_list = list(list(name = "Curation team", affiliation = "UNHCR", email = "xxx@xxx.org"),
                          list(name = "Another team", affiliation = "UNHCR", email = "xxx2@xxx.org")),
-    publication_year = 2021
+    publication_year = 2025
 )
 
 # create the survey passing the metadata list
 a_response <- mdl_survey_create(
     survey_metadata_list = a_survey_metadata,
     enum_collection = mdl_enum_collection$MENA,
-    enum_survey_access_policy = mdl_enum_survey_access_policy$`Data available from external repository (link)`,
-    data_remote_url = "https://www.google.it",
+    enum_survey_access_policy = mdl_enum_survey_access_policy$`Licensed use files`,
     published = FALSE,
     overwrite = TRUE
 )
@@ -110,7 +109,8 @@ a_response <- mdl_resource_upload_file_and_link(
     file_path = "test_file.csv",
     enum_resource_type = mdl_enum_resource_type$microdata,
     title = "Household data",
-    description = "Contains the household data collected during the survey"
+    description = "Contains the household data collected during the survey",
+    overwrite = T
 )
 
 

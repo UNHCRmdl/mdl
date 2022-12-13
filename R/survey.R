@@ -370,8 +370,6 @@ survey_create <- function(
         "overwrite"=overwrite
     )
 
-    print("used data_class_code and id and title")
-
     options <- c(options,metadata)
 
     url <- paste(mdl_api_get_url(), "datasets", "create", type, idno, sep = "/" )
@@ -543,14 +541,20 @@ mdl_survey_get <- function(survey_idno){
 #'
 #' @return API call response.
 #'
+#' @param limit Max number of datasets to get. Default is 50.
+#' @param offset Point from which the query will start, to be used if you want to used paging. Default is 0.
+#'
 #' @export
-mdl_survey_list <- function(){
+mdl_survey_list <- function(limit = 50, offset = 0){
+
 
     url <- paste(mdl_api_get_url(), 'datasets', sep = "/")
+    url <- paste(url, paste0("limit=", limit), sep = "?")
+    url <- paste(url, paste0("offset=", offset), sep = "&")
 
     httpResponse <- httr::GET(url,
-                              httr::add_headers("X-API-KEY" = mdl_api_get_key())
-                              #,httr::accept_json()
+                              httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                              encode = "json"
     )
 
     response_content <- httr::content(httpResponse, "text")
@@ -564,6 +568,26 @@ mdl_survey_list <- function(){
     return (output)
 }
 
+
+#' Set survey options
+#'
+#' Can set various survey options with a PUT call
+#'
+#' @return API call response.
+#'
+#' @param survey_idno Dataset IDNo.
+#' @param enum_survey_access_policy Access policy. It is recommended to use mdl_enum_survey_access_policy.
+#' @param data_remote_url Url to data in case access policiy was set to Data available from external repository ("remote")
+#' @param published Set Dataset publish status. 0=draft, 1=published.
+#' @param enum_collection Main collection of the dataset. It is recommended to use mdl_enum_collection.
+#' @param linked_collections Array containing other secondary collections in which the dataset has to be shown.
+#' @param tags Array of straing tags.
+#' @param aliases Array of strings with dataset aliases
+#' @param link_study URL for study website
+#' @param link_indicator URL to the indicators website
+#'
+#'
+#' @export
 mdl_survey_options <- function(
     survey_idno,
     enum_survey_access_policy = NULL,
@@ -616,4 +640,69 @@ mdl_survey_options <- function(
     return (output)
 
 }
+
+
+
+
+
+#' Attach studies to collections
+#'
+#' Used to modify the main collection and/or add the secondary collections.
+#' In case you only want to change the main collection, set link_collections to the same value of enum_collection or consider using the function mdl_survey_options.
+#'
+#' @return API call response.
+#'
+#' @param survey_idno Dataset IDNo.
+#' @param enum_collection Main collection of the dataset (optional). It is recommended to use mdl_enum_collection.
+#' @param link_collections List containing other secondary collections in which the dataset has to be shown (required).
+#' @param mode Select flag to update or replace existing linked collections for the study: "replace" = replace linked collections for the study with the provided list; "update" = (Default) add/update linked collections list.
+#'
+#'
+#' @export
+mdl_survey_attach_to_collections <- function(
+    survey_idno,
+    enum_collection = NULL,
+    link_collections,
+    mode = "update"
+
+){
+
+    # specify call options
+    options <- list(
+        study_idno = survey_idno,
+        owner_collection = enum_collection,
+        link_collections = as.list(link_collections),
+        mode = mode
+    )
+
+    # specify url
+    url <-  paste(mdl_api_get_url(), "datasets", "collections", sep = "/")
+
+    # call API
+    httpResponse <- httr::POST(url,
+                              httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                              body = options,
+                              encode = "json"
+    )
+
+    response_content <- httr::content(httpResponse, "text")
+
+    output <- jsonlite::fromJSON(response_content)
+    if(!is.list(output)){
+        output <- list(output)
+    }
+
+    if(httpResponse$status_code!=200){
+        warning(response_content)
+    }
+
+    return (output)
+
+}
+
+
+
+
+
+
 
