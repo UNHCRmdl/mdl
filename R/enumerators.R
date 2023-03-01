@@ -20,7 +20,22 @@ mdl_enum_collection <- list(
     WestAfrica = "WA",
     EastAfrica = "EHA",
     SouthernAfrica = "SAO",
-    WorldBank = "WBG"
+    WorldBank = "WBG",
+    PDM = "PDM",
+    LIS = "LIS",
+    EIS = "EIS",
+    ProtectionMonitoring = "PRM",
+    VulnerabilityAssessments = "VUL",
+    NeedsAssessments = "NAS",
+    KAP-WASH = "KAP",
+    SENS = "SENS",
+    ReturnandMovementIntentionsSurvey = "MIS",
+    IDP-Profiling = "IDP",
+    StatelessnessSurveys = "STA",
+    COVID19 = "C19",
+    UNHCR-WFPJointAssessment = "JAM",
+    SocioEconomicAssessments = "SEA",
+    RMS = "RMS"
 )
 
 # list of possible ways to publish the data files

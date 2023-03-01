@@ -1,3 +1,24 @@
+# checks if data is in correct format
+is_date <-  function(x, format = "%Y-%m-%d") {
+    formatted = try(as.Date(x, format), silent = TRUE)
+    is_date = as.character(formatted) == x & !is.na(formatted)  # valid and identical to input
+    is_date[is.na(x)] = NA  # Insert NA for NA in x
+
+    if(! is_date %in% c(TRUE) && ! x %in% c( "", NA) && ! is.null(x) ) {
+        error_message <- (paste0("The date provided is not correct (", x, "). Please use the format yyyy-mm-dd and make sure that the date is correct."))
+        stop(error_message)
+    }
+}
+
+# is_date("")
+# is_date(NA)
+# is_date(NULL)
+# is_date("12/12/2022")
+# is_date("2023-02-29")
+# is_date("2024-02-29")
+
+
+
 #' Create metadata list to create a survey
 #'
 #' Creates a list to be passed as an argument to the mdl_survey_create function to create a survey in the MDL.
@@ -30,7 +51,7 @@
 #' @param data_collectors Vector with the name of the actual data collectors, e.g.: c("National Bureau of Statistics", "Department of Immigration Services")
 #' @param questionnaire_description Description of the questionnaire sections. Use \\n to start a new line in the text.
 #' @param contacts_list A list with the contacts. Each contact is a list with the following objects: name, affiliation, email; e.g.: list(list(name = "Curation team", affiliation = "UNHCR", email = "microdata@unhcr.org"))
-#' @param publication_year Year of publication (used to generate the citation), used in the citation. If not provided, it will be taken from the collection_date_end.
+#' @param publication_year Year of publication used in the citation. If not provided, it will be taken from the collection_date_end.
 #'
 #' @export
 mdl_survey_generate_metadata_list <- function(
@@ -62,6 +83,10 @@ mdl_survey_generate_metadata_list <- function(
     contacts_list = list(list(name = "Curation team", affiliation = "UNHCR", email = "microdata@unhcr.org")),
     publication_year = NULL
 ){
+    # check dates
+    is_date(version_date)
+    is_date(collection_date_start)
+    is_date(collection_date_end)
 
     # create countries
     country_ISO_alpha3_codes <- toupper(country_ISO_alpha3_codes)
@@ -571,7 +596,8 @@ mdl_survey_list <- function(limit = 50, offset = 0){
 
 #' Set survey options
 #'
-#' Can set various survey options with a PUT call
+#' Can set various survey options with a PUT call.
+#' If you want to set linked/secondary collections, it is recommended to use mdl_survey_attach_to_collections().
 #'
 #' @return API call response.
 #'
@@ -581,7 +607,7 @@ mdl_survey_list <- function(limit = 50, offset = 0){
 #' @param published Set Dataset publish status. 0=draft, 1=published.
 #' @param enum_collection Main collection of the dataset. It is recommended to use mdl_enum_collection.
 #' @param linked_collections Array containing other secondary collections in which the dataset has to be shown.
-#' @param tags Array of straing tags.
+#' @param tags Array of string tags.
 #' @param aliases Array of strings with dataset aliases
 #' @param link_study URL for study website
 #' @param link_indicator URL to the indicators website
@@ -648,7 +674,7 @@ mdl_survey_options <- function(
 #' Attach studies to collections
 #'
 #' Used to modify the main collection and/or add the secondary collections.
-#' In case you only want to change the main collection, set link_collections to the same value of enum_collection or consider using the function mdl_survey_options.
+#' In case you only want to change the main collection it is recommended to use mdl_survey_options(), or you can try to set link_collections to the same value of enum_collection.
 #'
 #' @return API call response.
 #'

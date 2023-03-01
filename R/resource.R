@@ -192,6 +192,9 @@ mdl_resource_upload_file_and_link <- function(survey_idno,
         overwrite <- "no"
     }
 
+    # check date
+    is_date(dcdate)
+
     # specify call options
     options <- list(
         idno = survey_idno,
