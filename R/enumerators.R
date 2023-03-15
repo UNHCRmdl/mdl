@@ -27,16 +27,19 @@ mdl_enum_collection <- list(
     ProtectionMonitoring = "PRM",
     VulnerabilityAssessments = "VUL",
     NeedsAssessments = "NAS",
-    KAP-WASH = "KAP",
+    KAP_WASH = "KAP",
     SENS = "SENS",
     ReturnandMovementIntentionsSurvey = "MIS",
-    IDP-Profiling = "IDP",
+    IDP_Profiling = "IDP",
     StatelessnessSurveys = "STA",
     COVID19 = "C19",
-    UNHCR-WFPJointAssessment = "JAM",
+    UNHCR_WFP_JointAssessment = "JAM",
     SocioEconomicAssessments = "SEA",
-    RMS = "RMS"
-)
+    RMS = "RMS",
+    ExternalDatasets = "EXT",
+    FAO_FoodAgricultureMicrodataCatalogue = "FAO",
+    HDX_HumanitarianDataExchange = "HDX"
+    )
 
 # list of possible ways to publish the data files
 #' @export

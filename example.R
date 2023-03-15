@@ -79,11 +79,15 @@ a_survey_metadata <-  mdl_survey_generate_metadata_list(
 # create the survey passing the metadata list
 a_response <- mdl_survey_create(
     survey_metadata_list = a_survey_metadata,
-    enum_collection = mdl_enum_collection$MENA,
+    enum_collection = mdl_enum_collection$EastAfrica,
     enum_survey_access_policy = mdl_enum_survey_access_policy$`Licensed use files`,
     published = FALSE,
     overwrite = TRUE
 )
+
+# add the dataset to a secondary data collections
+a_response <- mdl_survey_attach_to_collections("UNHCR_ETH_2021_TEST_v2.1", link_collections = c(mdl_enum_collection$ProtectionMonitoring, mdl_enum_collection$VulnerabilityAssessments))
+
 
 # get a test data frame and label it with package labelled
 # alternatively, you can import a data frame from a Stata file using haven::read_dta
@@ -99,6 +103,11 @@ a_response <- mdl_vars_create_from_dataframe(
     file_name = "Households",
     file_description = "This file contains the household data collected during the survey."
 )
+
+
+# create PDF documentation
+a_response <- mdl_survey_generate_pdf("UNHCR_ETH_2021_TEST_v2.1")
+
 
 # create a test file
 write.csv(iris, "test_file.csv")

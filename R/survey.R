@@ -680,7 +680,7 @@ mdl_survey_options <- function(
 #'
 #' @param survey_idno Dataset IDNo.
 #' @param enum_collection Main collection of the dataset (optional). It is recommended to use mdl_enum_collection.
-#' @param link_collections List containing other secondary collections in which the dataset has to be shown (required).
+#' @param link_collections Array containing other secondary collections in which the dataset has to be shown (required). It is recommended to use mdl_enum_collection.
 #' @param mode Select flag to update or replace existing linked collections for the study: "replace" = replace linked collections for the study with the provided list; "update" = (Default) add/update linked collections list.
 #'
 #'
