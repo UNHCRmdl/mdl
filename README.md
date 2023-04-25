@@ -105,6 +105,11 @@ a_response <- mdl_survey_create(
 ```
 Please note that this will only create the survey metadata. The variables metadata and the resources will be created in the following steps.
 
+You can add the dataset to other secondary collections with the following function:
+```r
+a_response <- mdl_survey_attach_to_collections("UNHCR_ETH_2021_TEST_v2.1", link_collections = c(mdl_enum_collection$ProtectionMonitoring, mdl_enum_collection$VulnerabilityAssessments))
+```
+
 
 ### Create the variables metadata
 
@@ -127,6 +132,11 @@ a_response <- mdl_vars_create_from_dataframe(
     file_name = "Households",
     file_description = "This file contains the household data collected during the survey."
 )
+```
+
+After creating the variables metadata, you can generate the PDF metadata documentation
+```r
+a_response <- mdl_survey_generate_pdf("UNHCR_ETH_2021_TEST_v2.1")
 ```
 
 
