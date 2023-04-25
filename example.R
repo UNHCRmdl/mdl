@@ -105,7 +105,7 @@ a_response <- mdl_vars_create_from_dataframe(
 )
 
 
-# create PDF documentation
+# create PDF metadata documentation
 a_response <- mdl_survey_generate_pdf("UNHCR_ETH_2021_TEST_v2.1")
 
 

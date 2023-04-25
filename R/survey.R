@@ -87,6 +87,11 @@ mdl_survey_generate_metadata_list <- function(
     is_date(version_date)
     is_date(collection_date_start)
     is_date(collection_date_end)
+    # check if dates are congruent
+    if( collection_date_end < collection_date_start ) {
+        error_message <- "Data collection end date is before start date."
+        stop(error_message)
+    }
 
     # create countries
     country_ISO_alpha3_codes <- toupper(country_ISO_alpha3_codes)

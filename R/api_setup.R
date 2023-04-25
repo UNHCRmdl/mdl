@@ -35,6 +35,7 @@ mdl_api_set_url <- function(enum_api_url){
 
 
 # Get API key
+#' @export
 mdl_api_get_key <-  function(){
     api_key <- Sys.getenv("MDL_API_KEY")
     if(is.null(api_key) || api_key == ""){
@@ -45,6 +46,7 @@ mdl_api_get_key <-  function(){
 }
 
 # Get API url
+#' @export
 mdl_api_get_url <-  function(){
     api_url <- Sys.getenv("MDL_API_URL")
     if(is.null(api_url) || api_url == ""){
