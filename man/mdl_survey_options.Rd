@@ -30,7 +30,7 @@ mdl_survey_options(
 
 \item{linked_collections}{Array containing other secondary collections in which the dataset has to be shown.}
 
-\item{tags}{Array of straing tags.}
+\item{tags}{Array of string tags.}
 
 \item{aliases}{Array of strings with dataset aliases}
 
@@ -42,5 +42,6 @@ mdl_survey_options(
 API call response.
 }
 \description{
-Can set various survey options with a PUT call
+Can set various survey options with a PUT call.
+If you want to set linked/secondary collections, it is recommended to use mdl_survey_attach_to_collections().
 }

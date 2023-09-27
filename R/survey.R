@@ -52,6 +52,10 @@ is_date <-  function(x, format = "%Y-%m-%d") {
 #' @param questionnaire_description Description of the questionnaire sections. Use \\n to start a new line in the text.
 #' @param contacts_list A list with the contacts. Each contact is a list with the following objects: name, affiliation, email; e.g.: list(list(name = "Curation team", affiliation = "UNHCR", email = "microdata@unhcr.org"))
 #' @param publication_year Year of publication used in the citation. If not provided, it will be taken from the collection_date_end.
+#' @param citation_requirements A string containing the citation requirements. If not specified or NULL is passed, an automatic citation string is created using the other metadata fields. To not include any citation pass an empty string "".
+#' @param metadata_producer The metadata producer. By default it is UNHCR
+#' @param metadata_production_date The date in which the metadata was produced, in the format yyyy-mm-dd, eg: 2019-04-30. By default, the current date is taken with Sys.Date().
+#'
 #'
 #' @export
 mdl_survey_generate_metadata_list <- function(
@@ -62,26 +66,29 @@ mdl_survey_generate_metadata_list <- function(
     series_information = "",
     abstract,
     enum_survey_kind_of_data = "",
-    unit_of_analysis,
-    version_description, #
+    unit_of_analysis = "",
+    version_description = "", #
     version_date = "", # yyyy-mm-dd
-    scope_description,
-    enum_survey_topics,
+    scope_description = "",
+    enum_survey_topics = c(),
     keywords = c(""),
     geographic_coverage = "",
     universe = "",
     primary_investigators, # c()
     other_producers = c(""),
-    sampling_description,
+    sampling_description = "",
     weighting_description = "",
     collection_date_start,
     collection_date_end,
-    enum_survey_collection_mode,
+    enum_survey_collection_mode = "",
     data_collection_notes = "",
-    data_collectors,
-    questionnaire_description,
+    data_collectors = c(),
+    questionnaire_description = "",
     contacts_list = list(list(name = "Curation team", affiliation = "UNHCR", email = "microdata@unhcr.org")),
-    publication_year = NULL
+    publication_year = NULL,
+    citation_requirements = NULL,
+    metadata_producer = "UNHCR",
+    metadata_production_date = as.character(Sys.Date())
 ){
     # check dates
     is_date(version_date)
@@ -113,16 +120,20 @@ mdl_survey_generate_metadata_list <- function(
         # paste0(investigators_string, ": ", countries_string, " - ", title, ". ", "UNHCR microdata library, https://microdata.unhcr.org")
         #UNHCR (2021). Kenya: Socio-economic assessment of refugees in Kakuma camp, 2015. Accessed from: https://microdata.unhcr.org.
 
+    if(! is.null(citation_requirements)){
+        a_survey_citation <- citation_requirements
+    }
+
     # create metadata list
     a_survey_metadata <- list(
 
         doc_desc=list(
             idno = survey_idno,
             title = gsub("[^A-Za-z0-9]", "_", title),
-            prod_date = as.character(Sys.Date()),
+            prod_date = as.character(metadata_production_date),
             producers=list(
                 list(
-                    name = "UNHCR",
+                    name = metadata_producer,
                     abbr= ""
                 )
             )
@@ -218,6 +229,8 @@ mdl_survey_generate_metadata_list <- function(
         )
     )
 
+
+
     # If no keyword was provided, remove it
     if(is.null(keywords) || keywords[1] %in% c(NA, "")){
         a_survey_metadata$study_desc$study_info$keywords <- NULL
@@ -225,8 +238,25 @@ mdl_survey_generate_metadata_list <- function(
 
     # If no other_producers was provided, remove it
     if(is.null(other_producers) || other_producers[1] %in% c(NA, "")){
-        a_survey_metadata$study_desc$production_statement$producers <- NULL
+        a_survey_metadata$study_desc$production_statement <- NULL
     }
+
+    # if contacts are not provided, remove them
+    if(is.null(contacts_list) | identical(contacts_list, NA) | identical(contacts_list, "")){
+        a_survey_metadata$study_desc$distribution_statement$contact <- NULL
+    }
+
+    # if topics are not provided, remove them
+    if(is.null(enum_survey_topics) | identical(enum_survey_topics, NA) | identical(enum_survey_topics, "")){
+        a_survey_metadata$study_desc$study_info$topics <- NULL
+    }
+
+    # if enum_survey_collection_mode are not provided, remove them
+    if(is.null(enum_survey_collection_mode) | identical(enum_survey_collection_mode, NA) | identical(enum_survey_collection_mode, "")){
+        a_survey_metadata$study_desc$method$data_collection$coll_mode <- NULL
+    }
+
+
 
     # return
     return(a_survey_metadata)

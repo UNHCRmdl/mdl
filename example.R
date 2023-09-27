@@ -1,5 +1,5 @@
 # set path to package
-setwd("C:\\Users\\SANSON\\Documents\\GitHub\\mdl\\R")
+setwd("C:\\Users\\SANSON\\Dropbox\\Fede\\GitHub\\mdl\\R")
 
 # creates all files for the package to work
 devtools::document()

@@ -16,7 +16,7 @@ mdl_survey_attach_to_collections(
 
 \item{enum_collection}{Main collection of the dataset (optional). It is recommended to use mdl_enum_collection.}
 
-\item{link_collections}{List containing other secondary collections in which the dataset has to be shown (required).}
+\item{link_collections}{Array containing other secondary collections in which the dataset has to be shown (required). It is recommended to use mdl_enum_collection.}
 
 \item{mode}{Select flag to update or replace existing linked collections for the study: "replace" = replace linked collections for the study with the provided list; "update" = (Default) add/update linked collections list.}
 }
@@ -25,5 +25,5 @@ API call response.
 }
 \description{
 Used to modify the main collection and/or add the secondary collections.
-In case you only want to change the main collection, set link_collections to the same value of enum_collection or consider using the function mdl_survey_options.
+In case you only want to change the main collection it is recommended to use mdl_survey_options(), or you can try to set link_collections to the same value of enum_collection.
 }

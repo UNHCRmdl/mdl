@@ -12,27 +12,30 @@ mdl_survey_generate_metadata_list(
   series_information = "",
   abstract,
   enum_survey_kind_of_data = "",
-  unit_of_analysis,
-  version_description,
+  unit_of_analysis = "",
+  version_description = "",
   version_date = "",
-  scope_description,
-  enum_survey_topics,
+  scope_description = "",
+  enum_survey_topics = c(),
   keywords = c(""),
   geographic_coverage = "",
   universe = "",
   primary_investigators,
   other_producers = c(""),
-  sampling_description,
+  sampling_description = "",
   weighting_description = "",
   collection_date_start,
   collection_date_end,
-  enum_survey_collection_mode,
+  enum_survey_collection_mode = "",
   data_collection_notes = "",
-  data_collectors,
-  questionnaire_description,
+  data_collectors = c(),
+  questionnaire_description = "",
   contacts_list = list(list(name = "Curation team", affiliation = "UNHCR", email =
     "microdata@unhcr.org")),
-  publication_year = NULL
+  publication_year = NULL,
+  citation_requirements = NULL,
+  metadata_producer = "UNHCR",
+  metadata_production_date = as.character(Sys.Date())
 )
 }
 \arguments{
@@ -88,7 +91,13 @@ mdl_survey_generate_metadata_list(
 
 \item{contacts_list}{A list with the contacts. Each contact is a list with the following objects: name, affiliation, email; e.g.: list(list(name = "Curation team", affiliation = "UNHCR", email = "microdata@unhcr.org"))}
 
-\item{publication_year}{Year of publication (used to generate the citation), used in the citation. If not provided, it will be taken from the collection_date_end.}
+\item{publication_year}{Year of publication used in the citation. If not provided, it will be taken from the collection_date_end.}
+
+\item{citation_requirements}{A string containing the citation requirements. If not specified or NULL is passed, an automatic citation string is created using the other metadata fields. To not include any citation pass an empty string "".}
+
+\item{metadata_producer}{The metadata producer. By default it is UNHCR}
+
+\item{metadata_production_date}{The date in which the metadata was produced, in the format yyyy-mm-dd, eg: 2019-04-30. By default, the current date is taken with Sys.Date().}
 }
 \value{
 A list containing the metadata to be passed to the mdl_survey_create function.
