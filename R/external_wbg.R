@@ -6,7 +6,7 @@
 #' @return API call response.
 #'
 #' @param library_url The url of the library, for example: "https://microdata.worldbank.org"
-#' @param wbg_survey_idno Unique identifier in the World Bank microdata library
+#' @param survey_idno Unique survey identifier in NADA
 #' @param base_path The path on your computer where the files will be downloaded, if not specified uses the current working directory
 #' @param upload_files TRUE if you want to upload a copy of the documentation files; FALSE if you want just to put a direct link to the files
 #' @param idno_prefix A string to be used as prefix of the idno, so that it can be easily recognized as harvested.
@@ -21,7 +21,7 @@ mdl_harvest_nada <- function(
     library_url = "https://microdata.worldbank.org",
     survey_idno,
     base_path = NULL,
-    upload_files = TRUE,
+    upload_files = FALSE,
     idno_prefix = "WBG",
     enum_collection = mdl_enum_collection$WorldBank,
     overwrite,
@@ -81,7 +81,7 @@ mdl_harvest_nada <- function(
     output = jsonlite::fromJSON(httr::content(httpResponse, "text"))
     print("output") ###
     # If remote access in WB Microdata Library, we link to the repository of origin.
-    if(output$dataset$data_access_type == "remote") {
+    if(identical(output$dataset$data_access_type, "remote")) {
         remote_url = output$dataset$remote_data_url
     } else {
         # Otherwise, we link to the WB Microdata Library survey page.

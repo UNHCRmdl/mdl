@@ -18,6 +18,8 @@ mdl_harvest_nada(
 \arguments{
 \item{library_url}{The url of the library, for example: "https://microdata.worldbank.org"}
 
+\item{survey_idno}{Unique survey identifier in NADA}
+
 \item{base_path}{The path on your computer where the files will be downloaded, if not specified uses the current working directory}
 
 \item{upload_files}{TRUE if you want to upload a copy of the documentation files; FALSE if you want just to put a direct link to the files}
@@ -29,8 +31,6 @@ mdl_harvest_nada(
 \item{overwrite}{TRUE if you want to overwrite the dataset in case it already exists; FALSE if you want to avoid to overwrite}
 
 \item{published}{TRUE if you want to publish directly the dataset; FALSE if you want just to load it in the back-end}
-
-\item{wbg_survey_idno}{Unique identifier in the World Bank microdata library}
 }
 \value{
 API call response.
