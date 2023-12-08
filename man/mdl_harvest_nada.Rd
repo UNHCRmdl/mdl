@@ -8,7 +8,7 @@ mdl_harvest_nada(
   library_url = "https://microdata.worldbank.org",
   survey_idno,
   base_path = NULL,
-  upload_files = TRUE,
+  upload_files = FALSE,
   idno_prefix = "WBG",
   enum_collection = mdl_enum_collection$WorldBank,
   overwrite,

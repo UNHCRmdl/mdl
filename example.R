@@ -147,3 +147,17 @@ a_response <- mdl_resource_upload_file_and_link(
 # a_response <- mdl_survey_generate_pdf(survey_idno = test_id)
 
 
+datasets_by_collection <- mdl_datasets_by_collection(limit = 5000)
+datasets_by_collection <- datasets_by_collection$datasets
+datasets_by_collection$linked_collection <- toupper(datasets_by_collection$linked_collection)
+
+datasets_by_collection2 <- dplyr::filter(datasets_by_collection, linked_collection %in% c(
+    "VUL",
+    "SEA",
+    "IDP",
+    "NAS"
+    ))
+table(datasets_by_collection2$linked_collection)
+
+datasets_by_collection2 <- dplyr::distinct(datasets_by_collection2,  .keep_all = TRUE)
+writexl::write_xlsx(datasets_by_collection2, "IMF.xlsx")
