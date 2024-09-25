@@ -344,6 +344,7 @@ mdl_survey_import_ddi <- function(xml_file, rdf_file = NULL, enum_collection, en
     # call API
     httpResponse <- httr::POST(url,
                                httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                               httr::user_agent(mdl::mdl_api_get_user_agent()),
                                body = options
                                #encode = "json"
     )
@@ -436,6 +437,7 @@ survey_create <- function(
 
     httpResponse <- httr::POST(url,
                                httr::add_headers("X-API-KEY" = api_key),
+                               httr::user_agent(mdl::mdl_api_get_user_agent()),
                          body=options,
                          #httr::content_type_json(),
                          encode="json"
@@ -514,7 +516,8 @@ mdl_survey_delete <- function(survey_idno){
     url <- paste(mdl_api_get_url(), 'datasets', survey_idno, sep = "/")
 
     httpResponse <- httr::DELETE(url,
-                              httr::add_headers("X-API-KEY" = mdl_api_get_key())
+                              httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                              httr::user_agent(mdl::mdl_api_get_user_agent())
     )
 
     response_content <- httr::content(httpResponse, "text")
@@ -560,7 +563,7 @@ mdl_survey_url <- function(survey_idno){
 mdl_survey_internal_id <- function(survey_idno){
 
     dataset_url <- mdl::mdl_survey_url(survey_idno)
-    dataset_internal_id <- basename(httr::GET(dataset_url)$url)
+    dataset_internal_id <- basename(httr::GET(dataset_url, httr::user_agent(mdl::mdl_api_get_user_agent()) )$url)
 
     return(dataset_internal_id)
 }
@@ -580,7 +583,8 @@ mdl_survey_get <- function(survey_idno){
     url <- paste(mdl_api_get_url(), 'datasets', survey_idno, sep = "/")
 
     httpResponse <- httr::GET(url,
-                              httr::add_headers("X-API-KEY" = mdl_api_get_key())
+                              httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                              httr::user_agent(mdl::mdl_api_get_user_agent())
                               )
 
     response_content <- httr::content(httpResponse, "text")
@@ -614,6 +618,7 @@ mdl_survey_list <- function(limit = 50, offset = 0){
 
     httpResponse <- httr::GET(url,
                               httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                              httr::user_agent(mdl::mdl_api_get_user_agent()),
                               encode = "json"
     )
 
@@ -683,6 +688,7 @@ mdl_survey_options <- function(
     # call API
     httpResponse <- httr::PUT(url,
                                httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                               httr::user_agent(mdl::mdl_api_get_user_agent()),
                                body = options,
                                encode = "json"
     )
@@ -742,6 +748,7 @@ mdl_survey_attach_to_collections <- function(
     # call API
     httpResponse <- httr::POST(url,
                               httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                              httr::user_agent(mdl::mdl_api_get_user_agent()),
                               body = options,
                               encode = "json"
     )

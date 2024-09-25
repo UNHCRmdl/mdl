@@ -76,7 +76,7 @@ mdl_harvest_nada <- function(
     print("ready to get info")
     # Extract the dataset access policy
     url <- paste0(library_url, "/index.php/api/catalog/", idno, "?id_format=idno")
-    httpResponse <- httr::GET(url)
+    httpResponse <- httr::GET(url, httr::user_agent(mdl::mdl_api_get_user_agent()))
     print("httpResponse") ###
     output = jsonlite::fromJSON(httr::content(httpResponse, "text"))
     print("output") ###

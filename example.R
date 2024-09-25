@@ -12,7 +12,7 @@ mdl_api_set_key(Sys.getenv("API_KEY_MDL"))
 mdl_api_get_key()
 
 # work on the UAT
-mdl_api_set_url(mdl_enum_api_url$uat)
+mdl_api_set_url(mdl_enum_api_url$production)
 mdl_api_get_url()
 
 # get collections to check if it works
@@ -66,7 +66,7 @@ a_survey_metadata <-  mdl_survey_generate_metadata_list(
     sampling_description = "Simple sampling was applied...",
     weighting_description = "Weight was calculated in the following manner...",
     collection_date_start = "2025-12-12",
-    collection_date_end = "2025-01-01",
+    collection_date_end = "2026-01-01",
     enum_survey_collection_mode = mdl_enum_survey_collection_mode$`Face-to-face [f2f]`,
     data_collection_notes = "Enumerators took a 3-day course...",
     data_collectors = c("Collector 1", "Collector2"),

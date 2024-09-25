@@ -9,6 +9,7 @@ survey_get_data_file_list <- function(
     # call API
     httpResponse <- httr::GET(url,
                                  httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                                 httr::user_agent(mdl::mdl_api_get_user_agent()),
                                  #body = options,
                                  encode = "json"
     )
@@ -44,6 +45,7 @@ survey_delete_data_file <- function(
     # call API
     httpResponse <- httr::DELETE(url,
                                  httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                                 httr::user_agent(mdl::mdl_api_get_user_agent()),
                                  #body = options,
                                  encode = "json"
     )
@@ -101,6 +103,7 @@ survey_create_data_file <- function(
     # call API
     httpResponse <- httr::POST(url,
                                httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                               httr::user_agent(mdl::mdl_api_get_user_agent()),
                                body = options,
                                encode = "json"
     )
@@ -147,6 +150,7 @@ survey_create_variable <- function(
     # call API
     httpResponse <- httr::POST(url,
                                httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                               httr::user_agent(mdl::mdl_api_get_user_agent()),
                                body = options,
                                encode = "json"
     )
@@ -550,7 +554,8 @@ mdl_survey_get_variable <- function(survey_idno, variable_id){
     url <- paste(mdl_api_get_url(), 'datasets', "variable", survey_idno, variable_id, sep = "/")
 
     httpResponse <- httr::GET(url,
-                              httr::add_headers("X-API-KEY" = mdl_api_get_key())
+                              httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                              httr::user_agent(mdl::mdl_api_get_user_agent())
     )
 
     response_content <- httr::content(httpResponse, "text")

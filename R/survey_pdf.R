@@ -67,6 +67,7 @@ survey_generate_pdf <- function(
     # call API
     httpResponse <- httr::POST(url,
                                httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                               httr::user_agent(mdl::mdl_api_get_user_agent()),
                                body = options,
                                encode = "json"
     )

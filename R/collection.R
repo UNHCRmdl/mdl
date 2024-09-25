@@ -12,6 +12,7 @@ mdl_collection_list <- function(){
 
     httpResponse <- httr::GET(url,
                               httr::add_headers("X-API-KEY" = mdl_api_get_key())
+                              ,httr::user_agent(mdl::mdl_api_get_user_agent())
     )
 
     response_content <- httr::content(httpResponse, "text")
@@ -41,6 +42,7 @@ mdl_collection_get <- function(collection_id){
 
     httpResponse <- httr::GET(url,
                               httr::add_headers("X-API-KEY" = mdl_api_get_key())
+                              ,httr::user_agent(mdl::mdl_api_get_user_agent())
     )
 
     response_content <- httr::content(httpResponse, "text")
@@ -74,6 +76,7 @@ mdl_datasets_by_collection <- function(limit = 500, offset = 0){
 
     httpResponse <- httr::GET(url,
                               httr::add_headers("X-API-KEY" = mdl_api_get_key())
+                              ,httr::user_agent(mdl::mdl_api_get_user_agent())
     )
 
     response_content <- httr::content(httpResponse, "text")

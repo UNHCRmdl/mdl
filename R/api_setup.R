@@ -57,6 +57,13 @@ mdl_api_get_url <-  function(){
 }
 
 
+# Get User Agent to pass through firewall
+#' @export
+mdl_api_get_user_agent <-  function(){
+    a_user_agent = "CurationTeam"
+    return(a_user_agent)
+}
+
 
 
 

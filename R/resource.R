@@ -55,7 +55,9 @@ mdl_resource_file_list <- function(survey_idno){
     # call API
     httpResponse <- httr::GET(url,
                               httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                              httr::user_agent(mdl::mdl_api_get_user_agent()),
                               encode = "json"
+
     )
 
     response_content <- httr::content(httpResponse, "text")
@@ -91,6 +93,7 @@ mdl_resource_list <- function(survey_idno){
     # call API
     httpResponse <- httr::GET(url,
                                httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                               httr::user_agent(mdl::mdl_api_get_user_agent()),
                                encode = "json"
     )
 
@@ -127,6 +130,7 @@ mdl_resource_delete <- function(survey_idno, resource_id){
     # call API
     httpResponse <- httr::DELETE(url,
                               httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                              httr::user_agent(mdl::mdl_api_get_user_agent()),
                               encode = "json"
     )
 
@@ -226,6 +230,7 @@ mdl_resource_upload_file_and_link <- function(survey_idno,
     # call API
     httpResponse <- httr::POST(url,
                                httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                               httr::user_agent(mdl::mdl_api_get_user_agent()),
                                body = options
                                #encode = "json"
     )
