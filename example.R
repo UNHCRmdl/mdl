@@ -1,3 +1,5 @@
+#devtools::install_github("UNHCRmdl/mdl")
+
 # set path to package
 setwd("C:\\Users\\SANSON\\Dropbox\\Fede\\GitHub\\mdl\\R")
 
@@ -6,6 +8,7 @@ devtools::document()
 
 # load the package like it was loaded with library()
 devtools::load_all()
+
 
 # specify api key
 mdl_api_set_key(Sys.getenv("API_KEY_MDL"))

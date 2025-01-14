@@ -2,7 +2,7 @@
 % Please edit documentation in R/variables.R
 \name{mdl_survey_get_variable}
 \alias{mdl_survey_get_variable}
-\title{Get a a variable}
+\title{Get a variable}
 \usage{
 mdl_survey_get_variable(survey_idno, variable_id)
 }

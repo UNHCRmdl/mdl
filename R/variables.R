@@ -539,7 +539,7 @@ mdl_vars_create_from_dataframe <- function(survey_idno, data_frame, file_id, fil
 
 
 
-#' Get a a variable
+#' Get a variable
 #'
 #' Fetches the metadata for a variable
 #'
@@ -569,3 +569,70 @@ mdl_survey_get_variable <- function(survey_idno, variable_id){
     return (output)
 }
 
+
+
+#' Get variables data files
+#'
+#' Get data files metadata containing variables
+#' Can be used when getting all variables to filter them by file
+#'
+#' @return API call response.
+#'
+#' @param survey_idno Survey unique identifier
+#'
+#' @export
+mdl_survey_get_variable_files <- function(survey_idno){
+
+    url <- paste(mdl_api_get_url(), 'datasets', "datafiles", survey_idno, sep = "/")
+
+    httpResponse <- httr::GET(url,
+                              httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                              httr::user_agent(mdl::mdl_api_get_user_agent())
+    )
+
+    response_content <- httr::content(httpResponse, "text")
+
+    if(httpResponse$status_code!=200){
+        warning(response_content)
+    }
+
+    output <- jsonlite::fromJSON(response_content)
+
+    return (output)
+}
+
+
+#' Get all variables
+#'
+#' Fetches list of variables for a given dataset, this contains variable name and label.
+#' It can be filtered using optional argument data file to get variables for only one data file (you can filter after receiving the unfiltered result as well since there is a column with the data file ID).
+#'
+#' @return API call response.
+#'
+#' @param survey_idno Survey unique identifier
+#' @param data_file Data file ID to be provided if want to get variables for only one specific data file (if not provided all variables will returned). Can be found using the function mdl_survey_get_variable_files() or it can be seen in the "fid" column in the result of this function itself.
+#'
+#' @export
+mdl_survey_get_variables <- function(survey_idno, data_file = NA){
+
+    url <- paste(mdl_api_get_url(), 'datasets', "variables", survey_idno, data_file, sep = "/")
+
+    if(is.na(data_file)){
+        url <- paste(mdl_api_get_url(), 'datasets', "variables", survey_idno, sep = "/")
+    }
+
+    httpResponse <- httr::GET(url,
+                              httr::add_headers("X-API-KEY" = mdl_api_get_key()),
+                              httr::user_agent(mdl::mdl_api_get_user_agent())
+    )
+
+    response_content <- httr::content(httpResponse, "text")
+
+    if(httpResponse$status_code!=200){
+        warning(response_content)
+    }
+
+    output <- jsonlite::fromJSON(response_content)
+
+    return (output)
+}
