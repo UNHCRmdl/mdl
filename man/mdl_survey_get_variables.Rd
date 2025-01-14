@@ -9,7 +9,7 @@ mdl_survey_get_variables(survey_idno, data_file = NA)
 \arguments{
 \item{survey_idno}{Survey unique identifier}
 
-\item{data_file}{Data file ID to be provided if want to get variables for only one specific data file (if not provided all variables will returned). Can be found using the function mdl_survey_get_variable_files() or it can be seen in the "fid" column in the result of this function itself.}
+\item{data_file}{Data file ID to be provided to get variables for only one specific data file (if not provided all variables will returned). Can be found using the function mdl_survey_get_variable_files() or it can be seen in the "fid" column in the result of this function itself.}
 }
 \value{
 API call response.

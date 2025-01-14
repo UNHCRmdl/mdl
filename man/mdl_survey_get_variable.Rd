@@ -15,5 +15,6 @@ mdl_survey_get_variable(survey_idno, variable_id)
 API call response.
 }
 \description{
-Fetches the metadata for a variable
+Fetches the metadata for a specific variable like numeric stats etc.
+If only need name and label you can use mdl_survey_get_variables.
 }

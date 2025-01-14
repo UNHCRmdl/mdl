@@ -541,7 +541,8 @@ mdl_vars_create_from_dataframe <- function(survey_idno, data_frame, file_id, fil
 
 #' Get a variable
 #'
-#' Fetches the metadata for a variable
+#' Fetches the metadata for a specific variable like numeric stats etc.
+#' If only need name and label you can use mdl_survey_get_variables.
 #'
 #' @return API call response.
 #'
@@ -573,8 +574,8 @@ mdl_survey_get_variable <- function(survey_idno, variable_id){
 
 #' Get variables data files
 #'
-#' Get data files metadata containing variables
-#' Can be used when getting all variables to filter them by file
+#' Get data files metadata containing variables.
+#' Can be used when getting all variables to filter them by file.
 #'
 #' @return API call response.
 #'
@@ -610,7 +611,7 @@ mdl_survey_get_variable_files <- function(survey_idno){
 #' @return API call response.
 #'
 #' @param survey_idno Survey unique identifier
-#' @param data_file Data file ID to be provided if want to get variables for only one specific data file (if not provided all variables will returned). Can be found using the function mdl_survey_get_variable_files() or it can be seen in the "fid" column in the result of this function itself.
+#' @param data_file Data file ID to be provided to get variables for only one specific data file (if not provided all variables will returned). Can be found using the function mdl_survey_get_variable_files() or it can be seen in the "fid" column in the result of this function itself.
 #'
 #' @export
 mdl_survey_get_variables <- function(survey_idno, data_file = NA){

@@ -13,6 +13,6 @@ mdl_survey_get_variable_files(survey_idno)
 API call response.
 }
 \description{
-Get data files metadata containing variables
-Can be used when getting all variables to filter them by file
+Get data files metadata containing variables.
+Can be used when getting all variables to filter them by file.
 }
